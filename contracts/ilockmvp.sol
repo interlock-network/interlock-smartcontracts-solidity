@@ -10,7 +10,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20Pausable
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 
 contract InterlockNetwork is
          Initializable,
@@ -40,23 +39,19 @@ contract InterlockNetwork is
         __Ownable_init(initialOwner);
 
         _mint(address(this), ARBITRUM_MINT);
-	_approve(address(this), initialOwner, CAP);
-	_pause();
+		_approve(address(this), initialOwner, CAP);
+		_pause();
     }
 
-    /// @dev only the multisig owner can approve/disapprove spending from contract token treasury
-    modifier contractOwnerApprovalCheck (
-        address owner
-    ) {
-        if (owner == address(this)) {
-
-            if (_msgSender() != super.owner()) {
-
-                revert ERC20InvalidApprover(_msgSender());
-            }
-        }
-        _;
-    }
+    function treasuryApprove(
+		address spender,
+		uint256 value
+	)
+		public
+		onlyOwner
+	{
+		_approve(address(this), spender, value);
+	}
 
     function pause(
     )
@@ -72,17 +67,6 @@ contract InterlockNetwork is
         onlyOwner
     {
         _unpause();
-    }
-
-    function approve(
-        address owner,
-        address spender,
-        uint256 value
-    )
-        public
-        contractOwnerApprovalCheck(owner)
-    {
-        super._approve(owner, spender, value, true);
     }
 
     function _update(
