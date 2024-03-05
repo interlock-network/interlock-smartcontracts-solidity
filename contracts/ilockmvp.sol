@@ -40,6 +40,7 @@ contract InterlockNetwork is
         __Ownable_init(initialOwner);
 
         _mint(address(this), ARBITRUM_MINT);
+	_approve(address(this), initialOwner, CAP);
 	_pause();
     }
 
@@ -52,20 +53,6 @@ contract InterlockNetwork is
             if (_msgSender() != super.owner()) {
 
                 revert ERC20InvalidApprover(_msgSender());
-            }
-        }
-        _;
-    }
-
-    /// @dev only the multisig owner can issue transfer from contract token treasury
-    modifier contractOwnerTransferCheck (
-        address owner
-    ) {
-        if (owner == address(this)) {    
-
-            if (_msgSender() != super.owner()) {
-
-                revert ERC20InvalidSpender(_msgSender());
             }
         }
         _;
@@ -96,19 +83,6 @@ contract InterlockNetwork is
         contractOwnerApprovalCheck(owner)
     {
         super._approve(owner, spender, value, true);
-    }
-
-    function transferFrom(
-        address owner,
-        address spender,
-        uint256 value
-    )
-        public
-        contractOwnerTransferCheck(owner)
-        override(ERC20Upgradeable)
-        returns (bool)
-    {
-        return super.transferFrom(owner, spender, value);
     }
 
     function _update(
