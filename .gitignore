@@ -102,8 +102,6 @@ gas-report.txt
 
 contracts/test/fuzzing/crytic-export
 
-package-lock.json
-
 .DS_Store
 *.swp
 *.swo
