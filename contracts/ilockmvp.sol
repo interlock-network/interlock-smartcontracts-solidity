@@ -40,6 +40,7 @@ contract InterlockNetwork is
         __Ownable_init(initialOwner);
 
         _mint(address(this), ARBITRUM_MINT);
+	_pause();
     }
 
     /// @dev only the multisig owner can approve/disapprove spending from contract token treasury
