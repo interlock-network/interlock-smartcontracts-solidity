@@ -108,3 +108,5 @@ contracts/test/fuzzing/crytic-export
 *.swn
 *.swm
 .env.dev
+
+typechain-types
