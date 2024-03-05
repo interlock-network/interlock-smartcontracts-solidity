@@ -39,19 +39,19 @@ contract InterlockNetwork is
         __Ownable_init(initialOwner);
 
         _mint(address(this), ARBITRUM_MINT);
-		_approve(address(this), initialOwner, CAP);
-		_pause();
+        _approve(address(this), initialOwner, CAP);
+        _pause();
     }
 
     function treasuryApprove(
-		address spender,
-		uint256 value
-	)
-		public
-		onlyOwner
-	{
-		_approve(address(this), spender, value);
-	}
+        address spender,
+        uint256 value
+    )
+        public
+        onlyOwner
+    {
+        _approve(address(this), spender, value);
+    }
 
     function pause(
     )
