@@ -32,4 +32,12 @@ Likewise, feel free to comment on issues as they come up. We use an org-wide lab
 
 Enjoy!
 
+# Contributing
 
+We are open to contributions from the community. Please open an issue or pull request if you have any suggestions or improvements.
+
+Packages are managed with [pnpm](https://pnpm.io/). To install dependencies, run:
+
+```bash
+pnpm install
+```
