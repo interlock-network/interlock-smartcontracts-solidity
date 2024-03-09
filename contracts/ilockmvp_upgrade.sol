@@ -13,24 +13,18 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 
 contract InterlockNetworkUpgrade is
-         Initializable,
-         ERC20Upgradeable,
-         ERC20PausableUpgradeable,
-         ERC20CappedUpgradeable,
-         OwnableUpgradeable {
-    
+    Initializable,
+    ERC20Upgradeable,
+    ERC20PausableUpgradeable,
+    ERC20CappedUpgradeable,
+    OwnableUpgradeable
+{
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(
-    ) {
+    constructor() {
         _disableInitializers();
     }
 
-    function initialize(
-        address initialOwner
-    )
-        public
-        initializer
-    {
+    function initialize(address initialOwner) public initializer {
         uint256 CAP = 1_000_000_000 * 10 ** decimals();
         uint256 ARBITRUM_MINT = 700_000_000 * 10 ** decimals();
 
@@ -43,13 +37,9 @@ contract InterlockNetworkUpgrade is
     }
 
     /// @dev only the multisig owner can approve/disapprove spending from contract token treasury
-    modifier contractOwnerApprovalCheck (
-        address owner
-    ) {
+    modifier contractOwnerApprovalCheck(address owner) {
         if (owner == address(this)) {
-
             if (_msgSender() != super.owner()) {
-
                 revert ERC20InvalidApprover(_msgSender());
             }
         }
@@ -57,32 +47,20 @@ contract InterlockNetworkUpgrade is
     }
 
     /// @dev only the multisig owner can issue transfer from contract token treasury
-    modifier contractOwnerTransferCheck (
-        address owner
-    ) {
-        if (owner == address(this)) {    
-
+    modifier contractOwnerTransferCheck(address owner) {
+        if (owner == address(this)) {
             if (_msgSender() != super.owner()) {
-
                 revert ERC20InvalidSpender(_msgSender());
             }
         }
         _;
     }
 
-    function pause(
-    )
-        public
-        onlyOwner
-    {
+    function pause() public onlyOwner {
         _pause();
     }
 
-    function unpause(
-    )
-        public
-        onlyOwner
-    {
+    function unpause() public onlyOwner {
         _unpause();
     }
 
@@ -90,10 +68,7 @@ contract InterlockNetworkUpgrade is
         address owner,
         address spender,
         uint256 value
-    )
-        public
-        contractOwnerApprovalCheck(owner)
-    {
+    ) public contractOwnerApprovalCheck(owner) {
         super._approve(owner, spender, value, true);
     }
 
@@ -103,8 +78,8 @@ contract InterlockNetworkUpgrade is
         uint256 value
     )
         public
-        contractOwnerTransferCheck(owner)
         override(ERC20Upgradeable)
+        contractOwnerTransferCheck(owner)
         returns (bool)
     {
         return super.transferFrom(owner, spender, value);
@@ -116,22 +91,19 @@ contract InterlockNetworkUpgrade is
         uint256 value
     )
         internal
-        override(ERC20Upgradeable, ERC20PausableUpgradeable, ERC20CappedUpgradeable)
+        override(
+            ERC20Upgradeable,
+            ERC20PausableUpgradeable,
+            ERC20CappedUpgradeable
+        )
     {
         super._update(from, to, value);
     }
 
-    function newFeature(
-    )
-    	public
-		pure
-		returns (string memory)
-	{
-
-    	return "new feature";
-	}
+    function newFeature() public pure returns (string memory) {
+        return "new feature";
+    }
 
     uint256 public newstorage;
     uint256[99] public storageGap;
 }
-

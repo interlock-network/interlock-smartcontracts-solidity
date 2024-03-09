@@ -1,41 +1,67 @@
-import "@openzeppelin/hardhat-upgrades";
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-import "@nomicfoundation/hardhat-ethers";
+import '@openzeppelin/hardhat-upgrades'
+import '@nomicfoundation/hardhat-ethers'
+import '@nomicfoundation/hardhat-verify'
+import 'hardhat-abi-exporter'
+import 'hardhat-gas-reporter'
+import { HardhatUserConfig } from 'hardhat/config'
 
-import * as dotenv from "dotenv";
-dotenv.config({ path: './.env.dev' });
+import * as dotenv from 'dotenv'
+dotenv.config({ path: './.env.dev' })
 
 const config: HardhatUserConfig = {
+  abiExporter: {
+    path: './abi',
+    clear: true,
+    flat: false,
+    except: ['@openzeppelin'],
+    spacing: 2,
+    runOnCompile: true,
+    pretty: false
+  },
+  gasReporter: {
+    coinmarketcap: process.env.CMC_API_KEY,
+    enabled: !!process.env.REPORT_GAS,
+    showTimeSpent: true
+  },
+  defender: {
+    apiKey: process.env.DEFENDER_API_KEY as string,
+    apiSecret: process.env.DEFENDER_API_SECRET as string,
+    useDefenderDeploy: true
+  },
+  networks: {
+    hardhat: {}
+  },
+  etherscan: {
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_APIKEY as string,
+      goerli: process.env.ETHERSCAN_APIKEY as string
+    }
+  },
   solidity: {
     compilers: [
       {
-        version: "0.8.20",
+        version: '0.8.20',
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 200
           },
-        },
+          metadata: {
+            // do not include the metadata hash, since this is machine dependent
+            // and we want all generated code to be deterministic
+            // https://docs.soliditylang.org/en/v0.8.24/metadata.html
+            bytecodeHash: 'none'
+          }
+        }
       }
     ]
   },
-  networks: {
-    // for testnet
-    "base-goerli": {
-      url: "https://goerli.base.org",
-      accounts: [process.env.OWNER_PRIKEY as string],
-      gasPrice: 1000000000,
-    },
-    "goerli": {
-      url: process.env.ALCHEMY_URL,
-      accounts: [process.env.OWNER_PRIKEY as string],
-    },
-  },
-  etherscan: {
-    url: "https://api-goerli.basescan.org/api",
-    apiKey: process.env.ETHERSCAN_APIKEY as string
+  paths: {
+    sources: './contracts',
+    tests: './test',
+    cache: './cache',
+    artifacts: './artifacts'
   }
-};
+}
 
-export default config;
+export default config

@@ -12,24 +12,18 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract InterlockNetwork is
-         Initializable,
-         ERC20Upgradeable,
-         ERC20PausableUpgradeable,
-         ERC20CappedUpgradeable,
-         OwnableUpgradeable {
-    
+    Initializable,
+    ERC20Upgradeable,
+    ERC20PausableUpgradeable,
+    ERC20CappedUpgradeable,
+    OwnableUpgradeable
+{
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(
-    ) {
+    constructor() {
         _disableInitializers();
     }
 
-    function initialize(
-        address initialOwner
-    )
-        public
-        initializer
-    {
+    function initialize(address initialOwner) public initializer {
         uint256 CAP = 1_000_000_000 * 10 ** decimals();
         uint256 ARBITRUM_MINT = 700_000_000 * 10 ** decimals();
 
@@ -43,29 +37,15 @@ contract InterlockNetwork is
         _pause();
     }
 
-    function treasuryApprove(
-        address spender,
-        uint256 value
-    )
-        public
-        onlyOwner
-    {
+    function treasuryApprove(address spender, uint256 value) public onlyOwner {
         _approve(address(this), spender, value);
     }
 
-    function pause(
-    )
-        public
-        onlyOwner
-    {
+    function pause() public onlyOwner {
         _pause();
     }
 
-    function unpause(
-    )
-        public
-        onlyOwner
-    {
+    function unpause() public onlyOwner {
         _unpause();
     }
 
@@ -75,7 +55,11 @@ contract InterlockNetwork is
         uint256 value
     )
         internal
-        override(ERC20Upgradeable, ERC20PausableUpgradeable, ERC20CappedUpgradeable)
+        override(
+            ERC20Upgradeable,
+            ERC20PausableUpgradeable,
+            ERC20CappedUpgradeable
+        )
     {
         super._update(from, to, value);
     }
@@ -83,4 +67,3 @@ contract InterlockNetwork is
     /// @dev Gap for upgradeable storage. */
     uint256[100] public storageGap;
 }
-
