@@ -1,6 +1,8 @@
 import '@openzeppelin/hardhat-upgrades'
+import '@nomicfoundation/hardhat-chai-matchers'
 import '@nomicfoundation/hardhat-ethers'
 import '@nomicfoundation/hardhat-verify'
+import '@typechain/hardhat'
 import 'hardhat-abi-exporter'
 import 'hardhat-gas-reporter'
 import { HardhatUserConfig } from 'hardhat/config'
@@ -25,8 +27,7 @@ const config: HardhatUserConfig = {
   },
   defender: {
     apiKey: process.env.DEFENDER_API_KEY as string,
-    apiSecret: process.env.DEFENDER_API_SECRET as string,
-    useDefenderDeploy: true
+    apiSecret: process.env.DEFENDER_API_SECRET as string
   },
   networks: {
     hardhat: {},

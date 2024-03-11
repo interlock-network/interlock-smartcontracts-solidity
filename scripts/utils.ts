@@ -1,6 +1,7 @@
-import hre, { ethers, defender, network } from 'hardhat'
+import hre, { ethers, defender, network, upgrades } from 'hardhat'
 import readline from 'readline'
 import { getImplementationAddress } from '@openzeppelin/upgrades-core'
+import { type BaseContract, Contract, Signer } from 'ethers'
 
 export async function verifyContract(address: string, constructorArguments: any[] = []) {
   await hre.run('verify:verify', {
@@ -9,12 +10,36 @@ export async function verifyContract(address: string, constructorArguments: any[
   })
 }
 
+export async function deployProxy<T extends BaseContract>(
+  contractName: string,
+  signer: Signer,
+  parameters: Array<any>
+) {
+  const contractFactory = await ethers.getContractFactory(contractName, signer)
+  const contract = await upgrades.deployProxy(contractFactory, [...parameters])
+  return (await contract.waitForDeployment()) as unknown as T
+}
+
 export async function deployWithDefender(contractName: string, params: Array<any>) {
   const contractFactory = await ethers.getContractFactory(contractName)
   const contract = await defender.deployContract(contractFactory, params)
-  await contract.waitForDeployment()
+  return contract.waitForDeployment()
+}
 
-  return contract
+export async function deployProxyWithDefender(
+  contractName: string,
+  params: Array<any>,
+  options: {
+    proxyAdminOwner?: `0x${string}`
+    initializerName?: string
+  }
+) {
+  const contractFactory = await ethers.getContractFactory(contractName)
+  const contract = await defender.deployProxy(contractFactory, params, {
+    initializer: options.initializerName,
+    initialOwner: options.proxyAdminOwner
+  })
+  return contract.waitForDeployment()
 }
 
 export async function deployWithDefenderInteractive(contractName: string, params: any = {}) {
@@ -38,24 +63,6 @@ export async function deployWithDefenderInteractive(contractName: string, params
   } else {
     console.log('Aborted.')
   }
-}
-
-export async function deployProxyWithDefender(
-  contractName: string,
-  params: Array<any>,
-  options: {
-    proxyAdminOwner?: `0x${string}`
-    initializerName?: string
-  }
-) {
-  const contractFactory = await ethers.getContractFactory(contractName)
-  const contract = await defender.deployProxy(contractFactory, params, {
-    initializer: options.initializerName,
-    initialOwner: options.proxyAdminOwner
-  })
-  await contract.waitForDeployment()
-
-  return contract
 }
 
 export async function deployProxyWithDefenderInteractive(
