@@ -4,13 +4,15 @@
     "clean": "hardhat clean",
     "compile": "hardhat compile",
     "format": "prettier --write \"**/*.ts\" \"contracts/**/*.sol\"",
-    "lint": "solhint \"contracts/**/*.sol\""
+    "lint": "solhint \"contracts/**/*.sol\"",
+    "verify": "hardhat verify"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
     "@nomicfoundation/hardhat-verify": "^2.0.4",
     "@openzeppelin/hardhat-upgrades": "^3.0.5",
+    "@openzeppelin/upgrades-core": "^1.32.5",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.3.12",

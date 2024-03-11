@@ -29,12 +29,15 @@ const config: HardhatUserConfig = {
     useDefenderDeploy: true
   },
   networks: {
-    hardhat: {}
+    hardhat: {},
+    arbitrumSepolia: {
+      url: 'https://sepolia-rollup.arbitrum.io/rpc',
+      chainId: 421614
+    }
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ETHERSCAN_APIKEY as string,
-      goerli: process.env.ETHERSCAN_APIKEY as string
+      arbitrumSepolia: process.env.ARBITRUM_APIKEY as string
     }
   },
   solidity: {
