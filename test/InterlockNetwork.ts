@@ -160,10 +160,17 @@ describe(`${contractName}`, () => {
       )
     })
 
-    it('should revert transfer if paused', async function () {
+    it('should revert transferFrom if paused', async function () {
       const amount = ethers.parseEther('1')
       await expect(
         ilock.connect(initialOwner).transferFrom(await ilock.getAddress(), testAccount.address, amount)
+      ).to.be.revertedWithCustomError(ilock, 'EnforcedPause')
+    })
+
+    it('should revert transfer if paused', async function () {
+      const amount = ethers.parseEther('1')
+      await expect(
+        ilock.connect(initialOwner).transfer(testAccount.address, amount)
       ).to.be.revertedWithCustomError(ilock, 'EnforcedPause')
     })
   })
