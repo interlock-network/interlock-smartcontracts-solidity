@@ -11,6 +11,14 @@ const contractsArgs: Record<
     InterlockNetwork: InterlockNetworkArgs
   }
 > = {
+  sepolia: {
+    InterlockNetwork: {
+      params: {
+        initialOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+      },
+      proxyAdminOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+    }
+  },
   arbitrumSepolia: {
     InterlockNetwork: {
       params: {
