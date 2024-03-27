@@ -41,3 +41,29 @@ Packages are managed with [pnpm](https://pnpm.io/). To install dependencies, run
 ```bash
 pnpm install
 ```
+
+## Development
+
+To compile the contracts, run:
+
+```bash
+pnpm compile
+```
+
+To run the tests, run:
+
+```bash
+pnpm test
+```
+
+To deploy the contracts, run:
+
+```bash
+npx hardhat run --network NETWORK_NAME scripts/deployment/InterlockNetwork.ts
+```
+
+To verify the contracts, run:
+
+```bash
+pnpm verify --network NETWORK_NAME CONTRACT_ADDRESS
+```

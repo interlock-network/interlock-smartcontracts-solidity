@@ -32,14 +32,17 @@ export async function deployProxyWithDefender(
   options: {
     proxyAdminOwner?: `0x${string}`
     initializerName?: string
+    salt?: string
   }
 ) {
   const contractFactory = await ethers.getContractFactory(contractName)
   const contract = await defender.deployProxy(contractFactory, params, {
     initializer: options.initializerName,
-    initialOwner: options.proxyAdminOwner
+    initialOwner: options.proxyAdminOwner,
+    salt: options.salt
   })
-  return contract.waitForDeployment()
+  // need to connect to local provider to use waitForDeployment
+  return contract.connect(ethers.provider).waitForDeployment()
 }
 
 export async function deployWithDefenderInteractive(contractName: string, params: any = {}) {
@@ -71,6 +74,7 @@ export async function deployProxyWithDefenderInteractive(
   options: {
     proxyAdminOwner?: `0x${string}`
     initializerName?: string
+    salt?: string
   }
 ) {
   console.log(
