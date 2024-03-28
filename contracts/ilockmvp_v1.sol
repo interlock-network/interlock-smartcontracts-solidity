@@ -1,4 +1,5 @@
 // INTERLOCK NETWORK ILOCK SOLIDITY CONTRACT
+// Version v1
 
 // SPDX-License-Identifier: MIT
 // Compatible with OpenZeppelin Contracts ^5.0.0
@@ -10,9 +11,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20Pausable
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 
-contract InterlockNetworkUpgrade is
+contract InterlockNetworkV1 is
     Initializable,
     ERC20Upgradeable,
     ERC20PausableUpgradeable,
@@ -34,26 +34,12 @@ contract InterlockNetworkUpgrade is
         __Ownable_init(initialOwner);
 
         _mint(address(this), ARBITRUM_MINT);
+        _approve(address(this), initialOwner, CAP);
+        _pause();
     }
 
-    /// @dev only the multisig owner can approve/disapprove spending from contract token treasury
-    modifier contractOwnerApprovalCheck(address owner) {
-        if (owner == address(this)) {
-            if (_msgSender() != super.owner()) {
-                revert ERC20InvalidApprover(_msgSender());
-            }
-        }
-        _;
-    }
-
-    /// @dev only the multisig owner can issue transfer from contract token treasury
-    modifier contractOwnerTransferCheck(address owner) {
-        if (owner == address(this)) {
-            if (_msgSender() != super.owner()) {
-                revert ERC20InvalidSpender(_msgSender());
-            }
-        }
-        _;
+    function treasuryApprove(address spender, uint256 value) public onlyOwner {
+        _approve(address(this), spender, value);
     }
 
     function pause() public onlyOwner {
@@ -62,27 +48,6 @@ contract InterlockNetworkUpgrade is
 
     function unpause() public onlyOwner {
         _unpause();
-    }
-
-    function approve(
-        address owner,
-        address spender,
-        uint256 value
-    ) public contractOwnerApprovalCheck(owner) {
-        super._approve(owner, spender, value, true);
-    }
-
-    function transferFrom(
-        address owner,
-        address spender,
-        uint256 value
-    )
-        public
-        override(ERC20Upgradeable)
-        contractOwnerTransferCheck(owner)
-        returns (bool)
-    {
-        return super.transferFrom(owner, spender, value);
     }
 
     function _update(
@@ -100,10 +65,6 @@ contract InterlockNetworkUpgrade is
         super._update(from, to, value);
     }
 
-    function newFeature() public pure returns (string memory) {
-        return "new feature";
-    }
-
-    uint256 public newstorage;
-    uint256[99] public storageGap;
+    /// @dev Gap for upgradeable storage. */
+    uint256[100] public storageGap;
 }

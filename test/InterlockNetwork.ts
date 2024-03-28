@@ -169,9 +169,10 @@ describe(`${contractName}`, () => {
 
     it('should revert transfer if paused', async function () {
       const amount = ethers.parseEther('1')
-      await expect(
-        ilock.connect(initialOwner).transfer(testAccount.address, amount)
-      ).to.be.revertedWithCustomError(ilock, 'EnforcedPause')
+      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount)).to.be.revertedWithCustomError(
+        ilock,
+        'EnforcedPause'
+      )
     })
   })
 
@@ -210,6 +211,52 @@ describe(`${contractName}`, () => {
       await expect(
         ilock.connect(testAccount).transferFrom(initialOwner, testAccount.address, ethers.parseEther('2'))
       ).to.be.revertedWithCustomError(ilock, 'ERC20InsufficientAllowance')
+    })
+  })
+
+  context('Cooldown', async function () {
+    beforeEach(async function () {
+      await ilock.connect(initialOwner).unpause()
+      await ilock
+        .connect(initialOwner)
+        .transferFrom(await ilock.getAddress(), initialOwner.address, ethers.parseEther('20000000'))
+    })
+
+    it('should be on cooldown right after big transfer', async function () {
+      const amount = ethers.parseEther('8000000')
+      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
+      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount)).to.be.revertedWithCustomError(
+        ilock,
+        'InterlockTransferCooldown'
+      )
+    })
+
+    it('should be on transfer cooldown after exactly 24 hours', async function () {
+      const amount = ethers.parseEther('8000000')
+
+      const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
+      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
+
+      await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86400]) // 24 hours
+      await ethers.provider.send('evm_mine')
+
+      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount))
+        .to.be.revertedWithCustomError(ilock, 'InterlockTransferCooldown')
+        .withArgs(initialOwner.address)
+    })
+
+    it('should be off cooldown after 24 hours + 1 second', async function () {
+      const amount = ethers.parseEther('8000000')
+
+      const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
+      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
+
+      await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86401]) // 24 hours + 1 second
+      await ethers.provider.send('evm_mine')
+
+      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount))
+        .to.be.emit(ilock, 'Transfer')
+        .withArgs(initialOwner.address, testAccount.address, amount)
     })
   })
 })
