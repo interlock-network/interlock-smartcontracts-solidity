@@ -82,12 +82,12 @@ contract InterlockNetwork is
     }
 
     function _evaluateCooldown(address from, uint256 value) private {
-        if (value >= 7_000_000 ether) {
+        if (value >= 7_000_000 ether && from != owner()) {
             _transferCooldowns[from] = block.timestamp + 1 days;
         }
     }
 
     /// @dev Gap for upgradeable storage. */
     /// v2 - reduced by 32 bytes for _transferCooldowns slot
-    uint256[99] public storageGap;
+    uint256[99] public __gap;
 }

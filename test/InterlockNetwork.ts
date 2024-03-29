@@ -219,13 +219,13 @@ describe(`${contractName}`, () => {
       await ilock.connect(initialOwner).unpause()
       await ilock
         .connect(initialOwner)
-        .transferFrom(await ilock.getAddress(), initialOwner.address, ethers.parseEther('20000000'))
+        .transferFrom(await ilock.getAddress(), testAccount.address, ethers.parseEther('20000000'))
     })
 
     it('should be on cooldown right after big transfer', async function () {
       const amount = ethers.parseEther('8000000')
-      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
-      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount)).to.be.revertedWithCustomError(
+      await ilock.connect(testAccount).transfer(initialOwner.address, amount)
+      await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount)).to.be.revertedWithCustomError(
         ilock,
         'InterlockTransferCooldown'
       )
@@ -235,28 +235,28 @@ describe(`${contractName}`, () => {
       const amount = ethers.parseEther('8000000')
 
       const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
-      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
+      await ilock.connect(testAccount).transfer(initialOwner.address, amount)
 
       await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86400]) // 24 hours
       await ethers.provider.send('evm_mine')
 
-      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount))
+      await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount))
         .to.be.revertedWithCustomError(ilock, 'InterlockTransferCooldown')
-        .withArgs(initialOwner.address)
+        .withArgs(testAccount.address)
     })
 
     it('should be off cooldown after 24 hours + 1 second', async function () {
       const amount = ethers.parseEther('8000000')
 
       const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
-      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
+      await ilock.connect(testAccount).transfer(initialOwner.address, amount)
 
       await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86401]) // 24 hours + 1 second
       await ethers.provider.send('evm_mine')
 
-      await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount))
+      await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount))
         .to.be.emit(ilock, 'Transfer')
-        .withArgs(initialOwner.address, testAccount.address, amount)
+        .withArgs(testAccount.address, initialOwner.address, amount)
     })
   })
 })

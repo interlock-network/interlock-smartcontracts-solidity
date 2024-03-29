@@ -66,5 +66,5 @@ contract InterlockNetworkV1 is
     }
 
     /// @dev Gap for upgradeable storage. */
-    uint256[100] public storageGap;
+    uint256[100] public __gap;
 }
