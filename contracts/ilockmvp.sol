@@ -34,7 +34,7 @@ contract InterlockNetwork is
     }
 
     modifier verifyCooldown(address from) {
-        if(_transferCooldowns[from] >= block.timestamp) {
+        if (_transferCooldowns[from] >= block.timestamp) {
             revert InterlockTransferCooldown(from);
         }
         _;
@@ -63,7 +63,10 @@ contract InterlockNetwork is
         _approve(address(this), spender, value);
     }
 
-    function setUpCooldown(uint256 duration, uint256 threshold) public onlyOwner {
+    function setUpCooldown(
+        uint256 duration,
+        uint256 threshold
+    ) public onlyOwner {
         transferCooldownDuration = duration;
         transferCooldownThreshold = threshold;
     }
@@ -81,13 +84,13 @@ contract InterlockNetwork is
         address to,
         uint256 value
     )
-        verifyCooldown(from)
         internal
         override(
             ERC20Upgradeable,
             ERC20PausableUpgradeable,
             ERC20CappedUpgradeable
         )
+        verifyCooldown(from)
     {
         _evaluateCooldown(from, value);
         super._update(from, to, value);
@@ -96,7 +99,13 @@ contract InterlockNetwork is
     function _evaluateCooldown(address from, uint256 value) private {
         uint256 cooldown = transferCooldownDuration;
         uint256 threshold = transferCooldownThreshold;
-        if (cooldown > 0 && threshold > 0 && value >= threshold && from != owner()) {
+        if (
+            cooldown > 0 &&
+            threshold > 0 &&
+            value >= threshold &&
+            from != owner() &&
+            from != address(this)
+        ) {
             _transferCooldowns[from] = block.timestamp + cooldown;
         }
     }
