@@ -7,26 +7,18 @@
     }
   ],
   "impls": {
-    "ea370e1527ff51a7ea2af5a5544b825612193472a58d05c1ee8f309b6855faee": {
+    "d73edec4ecf8471fdbb66bfda4c8c85b5adc21f09916af1210a0fa18569c70a2": {
       "address": "0x12F3C55E2c1385092b144E1fe5C0553b5BC99B49",
       "layout": {
         "solcVersion": "0.8.20",
         "storage": [
           {
-            "label": "_transferCooldowns",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "InterlockNetwork",
-            "src": "contracts/ilockmvp.sol:22"
-          },
-          {
             "label": "__gap",
             "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)99_storage",
+            "slot": "0",
+            "type": "t_array(t_uint256)100_storage",
             "contract": "InterlockNetwork",
-            "src": "contracts/ilockmvp.sol:92"
+            "src": "contracts/ilockmvp_v1.sol:69"
           }
         ],
         "types": {
@@ -148,9 +140,9 @@
             "label": "uint64",
             "numberOfBytes": "8"
           },
-          "t_array(t_uint256)99_storage": {
-            "label": "uint256[99]",
-            "numberOfBytes": "3168"
+          "t_array(t_uint256)100_storage": {
+            "label": "uint256[100]",
+            "numberOfBytes": "3200"
           }
         },
         "namespaces": {
