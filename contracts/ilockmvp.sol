@@ -19,6 +19,8 @@ contract InterlockNetwork is
     ERC20CappedUpgradeable,
     OwnableUpgradeable
 {
+    uint256 public transferCooldownDuration;
+    uint256 public transferCooldownThreshold;
     mapping(address => uint256) private _transferCooldowns;
 
     /**
@@ -41,6 +43,8 @@ contract InterlockNetwork is
     function initialize(address initialOwner) public initializer {
         uint256 CAP = 1_000_000_000 ether;
         uint256 ARBITRUM_MINT = 700_000_000 ether;
+        uint256 INITIAL_COOLDOWN_DURATION = 1 days;
+        uint256 INITIAL_COOLDOWN_THRESHOLD = 7_000_000 ether;
 
         __ERC20_init("InterlockNetwork", "ILOCK");
         __ERC20Pausable_init();
@@ -50,10 +54,18 @@ contract InterlockNetwork is
         _mint(address(this), ARBITRUM_MINT);
         _approve(address(this), initialOwner, CAP);
         _pause();
+
+        transferCooldownDuration = INITIAL_COOLDOWN_DURATION;
+        transferCooldownThreshold = INITIAL_COOLDOWN_THRESHOLD;
     }
 
     function treasuryApprove(address spender, uint256 value) public onlyOwner {
         _approve(address(this), spender, value);
+    }
+
+    function setUpCooldown(uint256 duration, uint256 threshold) public onlyOwner {
+        transferCooldownDuration = duration;
+        transferCooldownThreshold = threshold;
     }
 
     function pause() public onlyOwner {
@@ -82,12 +94,16 @@ contract InterlockNetwork is
     }
 
     function _evaluateCooldown(address from, uint256 value) private {
-        if (value >= 7_000_000 ether && from != owner()) {
-            _transferCooldowns[from] = block.timestamp + 1 days;
+        uint256 cooldown = transferCooldownDuration;
+        uint256 threshold = transferCooldownThreshold;
+        if (cooldown > 0 && threshold > 0 && value >= threshold && from != owner()) {
+            _transferCooldowns[from] = block.timestamp + cooldown;
         }
     }
 
     /// @dev Gap for upgradeable storage. */
-    /// v2 - reduced by 32 bytes for _transferCooldowns slot
-    uint256[99] public __gap;
+    /// v2 - minus 32 bytes for transferCooldownDuration slot
+    /// v2 - minus 32 bytes for transferCooldownThreshold slot
+    /// v2 - minus 32 bytes for _transferCooldowns slot
+    uint256[97] public __gap;
 }

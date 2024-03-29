@@ -3,7 +3,7 @@ import { ethers } from 'hardhat'
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers'
 import { InterlockNetwork } from '../typechain-types'
 import { expect } from 'chai'
-import { ilock_settings } from './constants'
+import { ilockSettings } from './constants'
 
 const contractName = 'InterlockNetwork'
 
@@ -34,35 +34,43 @@ describe(`${contractName}`, () => {
     })
 
     it('should have the correct name', async function () {
-      expect(await ilock.name()).to.equal(ilock_settings.name)
+      expect(await ilock.name()).to.equal(ilockSettings.name)
     })
 
     it('should have the correct symbol', async function () {
-      expect(await ilock.symbol()).to.equal(ilock_settings.symbol)
+      expect(await ilock.symbol()).to.equal(ilockSettings.symbol)
     })
 
     it('should have the correct decimals', async function () {
-      expect(await ilock.decimals()).to.equal(ilock_settings.decimals)
+      expect(await ilock.decimals()).to.equal(ilockSettings.decimals)
     })
 
     it('should have the correct total supply', async function () {
-      expect(await ilock.totalSupply()).to.equal(ilock_settings.initial_supply)
+      expect(await ilock.totalSupply()).to.equal(ilockSettings.initialSupply)
     })
 
     it('should have the correct cap', async function () {
-      expect(await ilock.cap()).to.equal(ilock_settings.cap)
+      expect(await ilock.cap()).to.equal(ilockSettings.cap)
     })
 
     it('should have the correct balance for the treasury', async function () {
-      expect(await ilock.balanceOf(await ilock.getAddress())).to.equal(ilock_settings.initial_supply)
+      expect(await ilock.balanceOf(await ilock.getAddress())).to.equal(ilockSettings.initialSupply)
     })
 
     it('should have the correct allowance for the initial owner', async function () {
-      expect(await ilock.allowance(await ilock.getAddress(), initialOwner.address)).to.equal(ilock_settings.cap)
+      expect(await ilock.allowance(await ilock.getAddress(), initialOwner.address)).to.equal(ilockSettings.cap)
     })
 
     it('should be paused', async function () {
       expect(await ilock.paused()).to.equal(true)
+    })
+
+    it('should have the correct cooldown duration', async function () {
+      expect(await ilock.transferCooldownDuration()).to.be.equal(ilockSettings.cooldownDuration)
+    })
+
+    it('should have the correct cooldown threshold', async function () {
+      expect(await ilock.transferCooldownThreshold()).to.be.equal(ilockSettings.cooldownThreshold)
     })
   })
 
@@ -215,48 +223,59 @@ describe(`${contractName}`, () => {
   })
 
   context('Cooldown', async function () {
-    beforeEach(async function () {
-      await ilock.connect(initialOwner).unpause()
-      await ilock
-        .connect(initialOwner)
-        .transferFrom(await ilock.getAddress(), testAccount.address, ethers.parseEther('20000000'))
-    })
+    context('turned on', async function () {
+      beforeEach(async function () {
+        await ilock.connect(initialOwner).setUpCooldown(ilockSettings.cooldownDuration, ilockSettings.cooldownThreshold)
+        await ilock.connect(initialOwner).unpause()
+        await ilock
+          .connect(initialOwner)
+          .transferFrom(await ilock.getAddress(), testAccount.address, ethers.parseEther('20000000'))
+      })
 
-    it('should be on cooldown right after big transfer', async function () {
-      const amount = ethers.parseEther('8000000')
-      await ilock.connect(testAccount).transfer(initialOwner.address, amount)
-      await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount)).to.be.revertedWithCustomError(
-        ilock,
-        'InterlockTransferCooldown'
-      )
-    })
+      it('should have the correct cooldown duration', async function () {
+        expect(await ilock.transferCooldownDuration()).to.be.equal(ilockSettings.cooldownDuration)
+      })
 
-    it('should be on transfer cooldown after exactly 24 hours', async function () {
-      const amount = ethers.parseEther('8000000')
+      it('should have the correct cooldown threshold', async function () {
+        expect(await ilock.transferCooldownThreshold()).to.be.equal(ilockSettings.cooldownThreshold)
+      })
 
-      const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
-      await ilock.connect(testAccount).transfer(initialOwner.address, amount)
+      it('should be on cooldown right after big transfer', async function () {
+        const amount = ethers.parseEther('8000000')
+        await ilock.connect(testAccount).transfer(initialOwner.address, amount)
+        await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount)).to.be.revertedWithCustomError(
+          ilock,
+          'InterlockTransferCooldown'
+        )
+      })
 
-      await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86400]) // 24 hours
-      await ethers.provider.send('evm_mine')
+      it('should be on transfer cooldown after exactly 24 hours', async function () {
+        const amount = ethers.parseEther('8000000')
 
-      await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount))
-        .to.be.revertedWithCustomError(ilock, 'InterlockTransferCooldown')
-        .withArgs(testAccount.address)
-    })
+        const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
+        await ilock.connect(testAccount).transfer(initialOwner.address, amount)
 
-    it('should be off cooldown after 24 hours + 1 second', async function () {
-      const amount = ethers.parseEther('8000000')
+        await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86400]) // 24 hours
+        await ethers.provider.send('evm_mine')
 
-      const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
-      await ilock.connect(testAccount).transfer(initialOwner.address, amount)
+        await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount))
+          .to.be.revertedWithCustomError(ilock, 'InterlockTransferCooldown')
+          .withArgs(testAccount.address)
+      })
 
-      await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86401]) // 24 hours + 1 second
-      await ethers.provider.send('evm_mine')
+      it('should be off cooldown after 24 hours + 1 second', async function () {
+        const amount = ethers.parseEther('8000000')
 
-      await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount))
-        .to.be.emit(ilock, 'Transfer')
-        .withArgs(testAccount.address, initialOwner.address, amount)
+        const latestTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0
+        await ilock.connect(testAccount).transfer(initialOwner.address, amount)
+
+        await ethers.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + 86401]) // 24 hours + 1 second
+        await ethers.provider.send('evm_mine')
+
+        await expect(ilock.connect(testAccount).transfer(initialOwner.address, amount))
+          .to.be.emit(ilock, 'Transfer')
+          .withArgs(testAccount.address, initialOwner.address, amount)
+      })
     })
   })
 })
