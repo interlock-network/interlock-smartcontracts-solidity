@@ -3,26 +3,22 @@
   "proxies": [
     {
       "address": "0x4B4Ee17F14dFcA4d09fF3312f5733360134EA34D",
-      "txHash": "0xc267d6b610c5250949bb15fa964ebe7363ceeb079a17339e4539f5370d0e34eb",
-      "remoteDeploymentId": "68e314d5-c69b-40e1-a141-e8cf2ee2d83f",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "cc23c9ddb50bbea01f5f74d29cd3577b7a6d4d17ffa9a82bb66d4b8768f64b9a": {
+    "d73edec4ecf8471fdbb66bfda4c8c85b5adc21f09916af1210a0fa18569c70a2": {
       "address": "0x19BfaFa632c23335963dF526ca2adEb82646FBe5",
-      "txHash": "0x7f4fb37e996bc3d694df164df47296b713f3b8ae871d845230f738f393b7b6b5",
-      "remoteDeploymentId": "c4544c7c-ddd8-48a7-ac05-9e1dc24bd165",
       "layout": {
         "solcVersion": "0.8.20",
         "storage": [
           {
-            "label": "storageGap",
+            "label": "__gap",
             "offset": 0,
             "slot": "0",
             "type": "t_array(t_uint256)100_storage",
             "contract": "InterlockNetwork",
-            "src": "contracts/ilockmvp.sol:68"
+            "src": "contracts/ilockmvp_v1.sol:69"
           }
         ],
         "types": {

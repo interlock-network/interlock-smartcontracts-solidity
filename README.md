@@ -59,7 +59,13 @@ pnpm test
 To deploy the contracts, run:
 
 ```bash
-npx hardhat run --network NETWORK_NAME scripts/deployment/InterlockNetwork.ts
+npx hardhat run --network NETWORK_NAME scripts/CONTRACT_NAME/deploy.ts
+```
+
+To upgrade the contracts, run:
+
+```bash
+npx hardhat run --network NETWORK_NAME scripts/CONTRACT_NAME/upgrade.ts
 ```
 
 To verify the contracts, run:

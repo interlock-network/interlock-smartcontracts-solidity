@@ -1,7 +1,7 @@
-import hre, { ethers, defender, network, upgrades } from 'hardhat'
+import hre, { defender, ethers, network, upgrades } from 'hardhat'
 import readline from 'readline'
 import { getImplementationAddress } from '@openzeppelin/upgrades-core'
-import { type BaseContract, Contract, Signer } from 'ethers'
+import { type BaseContract, Signer } from 'ethers'
 
 export async function verifyContract(address: string, constructorArguments: any[] = []) {
   await hre.run('verify:verify', {
@@ -43,6 +43,11 @@ export async function deployProxyWithDefender(
   })
   // need to connect to local provider to use waitForDeployment
   return contract.connect(ethers.provider).waitForDeployment()
+}
+
+export async function proposeUpgradeWithDefender(contractName: string, proxyAddress: string) {
+  const contractFactory = await ethers.getContractFactory(contractName)
+  return await defender.proposeUpgradeWithApproval(proxyAddress, contractFactory)
 }
 
 export async function deployWithDefenderInteractive(contractName: string, params: any = {}) {
@@ -98,6 +103,27 @@ export async function deployProxyWithDefenderInteractive(
     }
 
     return contract
+  } else {
+    console.log('Aborted.')
+  }
+}
+
+export async function proposeUpgradeWithDefenderInteractive(contractName: string, proxyAddress: string) {
+  console.log(
+    `Upgrade proposal of ${contractName} on ${proxyAddress} address will be sent to Defender along with new implementation deployment on ${network.name} network`
+  )
+
+  if (await confirm('\nDo you want to continue? [y/N] ')) {
+    console.log('Upgrading contract...')
+
+    const upgradeProposal = await proposeUpgradeWithDefender(contractName, proxyAddress)
+    console.log(`${contractName} upgrade proposal:\n${upgradeProposal}`)
+
+    if (await confirm('\nDo you want to verify contract implementation? [y/N] ')) {
+      const implementationAddress = await getImplementationAddress(ethers.provider, proxyAddress)
+      console.log('Implementation address: ', implementationAddress)
+      await verifyContract(implementationAddress)
+    }
   } else {
     console.log('Aborted.')
   }

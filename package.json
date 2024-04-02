@@ -20,7 +20,7 @@
     "@types/mocha": "^10.0.6",
     "dotenv": "^16.4.5",
     "ethers": "^6.11.1",
-    "hardhat": "^2.21.0",
+    "hardhat": "^2.22.2",
     "hardhat-abi-exporter": "^2.10.1",
     "hardhat-gas-reporter": "^1.0.10",
     "mocha": "^10.3.0",

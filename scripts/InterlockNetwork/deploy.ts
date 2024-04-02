@@ -1,6 +1,6 @@
 import contractsArgs from '../contractsArgs'
-import { deployProxyWithDefenderInteractive } from '../utils'
 import { network } from 'hardhat'
+import { deployProxyWithDefenderInteractive } from '../utils'
 
 const contractName = 'InterlockNetwork'
 
