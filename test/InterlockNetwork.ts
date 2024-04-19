@@ -11,11 +11,18 @@ describe(`${contractName}`, () => {
   let ilock: InterlockNetwork
   let deployer: SignerWithAddress
   let initialOwner: SignerWithAddress
+  let pauser: SignerWithAddress
+  let minter: SignerWithAddress
+  let burner: SignerWithAddress
   let testAccount: SignerWithAddress
   let snapshot: number
 
+  const PAUSER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('PAUSER_ROLE'))
+  const MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('MINTER_ROLE'))
+  const BURNER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('BURNER_ROLE'))
+
   before(async () => {
-    ;[deployer, initialOwner, testAccount] = await ethers.getSigners()
+    ;[deployer, initialOwner, pauser, minter, burner, testAccount] = await ethers.getSigners()
     ilock = await deployProxy(contractName, deployer, [initialOwner.address])
   })
 
@@ -29,8 +36,20 @@ describe(`${contractName}`, () => {
   })
 
   context('Initial settings', async function () {
-    it('should have the correct initial owner', async function () {
-      expect(await ilock.owner()).to.equal(initialOwner.address)
+    it('should have DEFAULT_ADMIN role', async function () {
+      expect(await ilock.hasRole(await ilock.DEFAULT_ADMIN_ROLE(), initialOwner.address)).to.equal(true)
+    })
+
+    it('should have PAUSER role', async function () {
+      expect(await ilock.hasRole(PAUSER_ROLE, initialOwner.address)).to.equal(true)
+    })
+
+    it('should have MINTER role', async function () {
+      expect(await ilock.hasRole(MINTER_ROLE, initialOwner.address)).to.equal(true)
+    })
+
+    it('should have BURNER role', async function () {
+      expect(await ilock.hasRole(BURNER_ROLE, initialOwner.address)).to.equal(true)
     })
 
     it('should have the correct name', async function () {
@@ -53,16 +72,8 @@ describe(`${contractName}`, () => {
       expect(await ilock.cap()).to.equal(ilockSettings.cap)
     })
 
-    it('should have the correct balance for the treasury', async function () {
-      expect(await ilock.balanceOf(await ilock.getAddress())).to.equal(ilockSettings.initialSupply)
-    })
-
-    it('should have the correct allowance for the initial owner', async function () {
-      expect(await ilock.allowance(await ilock.getAddress(), initialOwner.address)).to.equal(ilockSettings.cap)
-    })
-
-    it('should be paused', async function () {
-      expect(await ilock.paused()).to.equal(true)
+    it('should not be paused', async function () {
+      expect(await ilock.paused()).to.equal(false)
     })
 
     it('should have the correct cooldown duration', async function () {
@@ -74,108 +85,135 @@ describe(`${contractName}`, () => {
     })
   })
 
-  context('Treasury', async function () {
-    beforeEach(async function () {
-      await ilock.connect(initialOwner).unpause()
+  context('Minting', async function () {
+    beforeEach(async () => {
+      await ilock.connect(initialOwner).grantRole(MINTER_ROLE, minter.address)
     })
 
-    it('should approve treasury', async function () {
+    it('should mint', async function () {
       const amount = ethers.parseEther('1')
-      await ilock.connect(initialOwner).treasuryApprove(testAccount.address, amount)
-      expect(await ilock.allowance(await ilock.getAddress(), testAccount.address)).to.equal(amount)
-    })
-
-    it('should transfer from treasury', async function () {
-      const amount = ethers.parseEther('1')
-      await ilock.connect(initialOwner).treasuryApprove(testAccount.address, amount)
-      await ilock.connect(testAccount).transferFrom(await ilock.getAddress(), testAccount.address, amount)
+      await ilock.connect(minter).mint(testAccount.address, amount)
       expect(await ilock.balanceOf(testAccount.address)).to.equal(amount)
     })
 
-    it('should revert treasury approve if not the owner', async function () {
+    it('should revert mint if not the minter', async function () {
       const amount = ethers.parseEther('1')
-      await expect(
-        ilock.connect(testAccount).treasuryApprove(testAccount.address, amount)
-      ).to.be.revertedWithCustomError(ilock, 'OwnableUnauthorizedAccount')
+      await expect(ilock.connect(testAccount).mint(testAccount.address, amount))
+        .to.be.revertedWithCustomError(ilock, 'AccessControlUnauthorizedAccount')
+        .withArgs(testAccount.address, MINTER_ROLE)
     })
 
-    it('should revert transfer from treasury if not enough allowance', async function () {
-      const amount = ethers.parseEther('1')
-      await expect(
-        ilock.connect(testAccount).transferFrom(await ilock.getAddress(), testAccount.address, amount)
-      ).to.be.revertedWithCustomError(ilock, 'ERC20InsufficientAllowance')
-    })
-
-    it('should revert transfer from treasury if paused', async function () {
-      await ilock.connect(initialOwner).pause()
-      const amount = ethers.parseEther('1')
-      await ilock.connect(initialOwner).treasuryApprove(testAccount.address, amount)
-      await expect(
-        ilock.connect(testAccount).transferFrom(await ilock.getAddress(), testAccount.address, amount)
-      ).to.be.revertedWithCustomError(ilock, 'EnforcedPause')
+    it('should revert mint if supply exceeds cap', async function () {
+      const amount = ilockSettings.cap + BigInt(1)
+      await expect(ilock.connect(minter).mint(testAccount.address, amount))
+        .to.be.revertedWithCustomError(ilock, 'ERC20ExceededCap')
+        .withArgs(amount, ilockSettings.cap)
     })
   })
 
-  context('Ownership', async function () {
-    it('should transfer ownership', async function () {
-      await ilock.connect(initialOwner).transferOwnership(testAccount.address)
-      expect(await ilock.owner()).to.equal(testAccount.address)
+  context('Burning', async function () {
+    beforeEach(async () => {
+      await ilock.connect(initialOwner).grantRole(BURNER_ROLE, burner.address)
+      await ilock.connect(initialOwner).mint(testAccount.address, ethers.parseEther('100'))
     })
 
-    it('should renounce ownership', async function () {
-      await ilock.connect(initialOwner).renounceOwnership()
-      expect(await ilock.owner()).to.equal(ethers.ZeroAddress)
+    it('should burn', async function () {
+      const initialBalance = await ilock.balanceOf(testAccount.address)
+      const amount = ethers.parseEther('1')
+      await ilock.connect(burner).burn(testAccount.address, amount)
+      expect(await ilock.balanceOf(testAccount.address)).to.equal(initialBalance - amount)
     })
 
-    it('should revert transfer ownership if not the owner', async function () {
-      await expect(ilock.connect(testAccount).renounceOwnership()).to.be.revertedWithCustomError(
-        ilock,
-        'OwnableUnauthorizedAccount'
-      )
+    it('should revert burn if not the burner', async function () {
+      const amount = ethers.parseEther('1')
+      await expect(ilock.connect(testAccount).burn(testAccount.address, amount))
+        .to.be.revertedWithCustomError(ilock, 'AccessControlUnauthorizedAccount')
+        .withArgs(testAccount.address, BURNER_ROLE)
+    })
+
+    it('should revert burn if not enough balance', async function () {
+      const initialBalance = await ilock.balanceOf(testAccount.address)
+      const amount = initialBalance + BigInt(1)
+      await expect(ilock.connect(burner).burn(testAccount.address, amount))
+        .to.be.revertedWithCustomError(ilock, 'ERC20InsufficientBalance')
+        .withArgs(testAccount.address, initialBalance, amount)
     })
   })
+
+  // context('Ownership', async function () {
+  //   it('should transfer ownership', async function () {
+  //     await ilock.connect(initialOwner).transferOwnership(testAccount.address)
+  //     expect(await ilock.owner()).to.equal(testAccount.address)
+  //   })
+  //
+  //   it('should renounce ownership', async function () {
+  //     await ilock.connect(initialOwner).renounceOwnership()
+  //     expect(await ilock.owner()).to.equal(ethers.ZeroAddress)
+  //   })
+  //
+  //   it('should revert transfer ownership if not the owner', async function () {
+  //     await expect(ilock.connect(testAccount).renounceOwnership()).to.be.revertedWithCustomError(
+  //       ilock,
+  //       'OwnableUnauthorizedAccount'
+  //     )
+  //   })
+  // })
 
   context('Pausing', async function () {
+    beforeEach(async () => {
+      await ilock.connect(initialOwner).grantRole(PAUSER_ROLE, pauser.address)
+      await ilock.connect(initialOwner).grantRole(MINTER_ROLE, minter.address)
+      await ilock.connect(minter).mint(initialOwner.address, ethers.parseEther('100'))
+      await ilock.connect(minter).mint(minter.address, ethers.parseEther('100'))
+      await ilock.connect(minter).approve(initialOwner.address, ethers.parseEther('100'))
+    })
+
     it('should unpause', async function () {
-      await ilock.connect(initialOwner).unpause()
+      await ilock.connect(pauser).pause()
+      await ilock.connect(pauser).unpause()
       expect(await ilock.paused()).to.equal(false)
     })
 
     it('should pause', async function () {
-      await ilock.connect(initialOwner).unpause()
-      await ilock.connect(initialOwner).pause()
+      await ilock.connect(pauser).pause()
       expect(await ilock.paused()).to.equal(true)
     })
 
     it('should transfer if not paused', async function () {
-      await ilock.connect(initialOwner).unpause()
       const amount = ethers.parseEther('1')
-      await ilock.connect(initialOwner).transferFrom(await ilock.getAddress(), testAccount.address, amount)
+      await ilock.connect(initialOwner).transfer(testAccount.address, amount)
       expect(await ilock.balanceOf(testAccount.address)).to.equal(amount)
     })
 
-    it('should revert pause if not the owner', async function () {
-      await expect(ilock.connect(testAccount).pause()).to.be.revertedWithCustomError(
-        ilock,
-        'OwnableUnauthorizedAccount'
-      )
+    it('should transferFrom if not paused', async function () {
+      const amount = ethers.parseEther('1')
+      await ilock.connect(initialOwner).transferFrom(minter.address, testAccount.address, amount)
+      expect(await ilock.balanceOf(testAccount.address)).to.equal(amount)
     })
 
-    it('should revert unpause if not the owner', async function () {
-      await expect(ilock.connect(testAccount).unpause()).to.be.revertedWithCustomError(
-        ilock,
-        'OwnableUnauthorizedAccount'
-      )
+    it('should revert pause if not the pauser', async function () {
+      await expect(ilock.connect(testAccount).pause())
+        .to.be.revertedWithCustomError(ilock, 'AccessControlUnauthorizedAccount')
+        .withArgs(testAccount.address, PAUSER_ROLE)
+    })
+
+    it('should revert unpause if not the pauser', async function () {
+      await expect(ilock.connect(testAccount).unpause())
+        .to.be.revertedWithCustomError(ilock, 'AccessControlUnauthorizedAccount')
+        .withArgs(testAccount.address, PAUSER_ROLE)
     })
 
     it('should revert transferFrom if paused', async function () {
+      await ilock.connect(minter).mint(initialOwner.address, ethers.parseEther('100'))
+      await ilock.connect(pauser).pause()
       const amount = ethers.parseEther('1')
       await expect(
-        ilock.connect(initialOwner).transferFrom(await ilock.getAddress(), testAccount.address, amount)
+        ilock.connect(initialOwner).transferFrom(minter.address, testAccount.address, amount)
       ).to.be.revertedWithCustomError(ilock, 'EnforcedPause')
     })
 
     it('should revert transfer if paused', async function () {
+      await ilock.connect(pauser).pause()
       const amount = ethers.parseEther('1')
       await expect(ilock.connect(initialOwner).transfer(testAccount.address, amount)).to.be.revertedWithCustomError(
         ilock,
@@ -186,10 +224,7 @@ describe(`${contractName}`, () => {
 
   context('Transfer', async function () {
     beforeEach(async function () {
-      await ilock.connect(initialOwner).unpause()
-      await ilock
-        .connect(initialOwner)
-        .transferFrom(await ilock.getAddress(), initialOwner.address, ethers.parseEther('100'))
+      await ilock.connect(initialOwner).mint(initialOwner.address, ethers.parseEther('100'))
     })
 
     it('should transfer', async function () {
@@ -223,22 +258,19 @@ describe(`${contractName}`, () => {
   })
 
   context('Cooldown', async function () {
+    let DEFAULT_ADMIN: string
+
     beforeEach(async function () {
-      await ilock.connect(initialOwner).unpause()
-      await ilock
-        .connect(initialOwner)
-        .transferFrom(await ilock.getAddress(), initialOwner.address, ilockSettings.cooldownThreshold * BigInt(3))
-      await ilock
-        .connect(initialOwner)
-        .transferFrom(await ilock.getAddress(), testAccount.address, ilockSettings.cooldownThreshold * BigInt(3))
+      await ilock.connect(initialOwner).mint(initialOwner.address, ilockSettings.cooldownThreshold * BigInt(3))
+      await ilock.connect(initialOwner).mint(testAccount.address, ilockSettings.cooldownThreshold * BigInt(3))
     })
 
     context('setup', async function () {
-      it('should revert setup cooldown if not the owner', async function () {
-        await expect(ilock.connect(testAccount).setUpCooldown(0, 0)).to.be.revertedWithCustomError(
-          ilock,
-          'OwnableUnauthorizedAccount'
-        )
+      it('should revert setup cooldown if does not have DEFAULT_ADMIN role', async function () {
+        const DEFAULT_ADMIN = await ilock.DEFAULT_ADMIN_ROLE()
+        await expect(ilock.connect(testAccount).setUpCooldown(0, 0))
+          .to.be.revertedWithCustomError(ilock, 'AccessControlUnauthorizedAccount')
+          .withArgs(testAccount.address, DEFAULT_ADMIN)
       })
 
       it('should setup cooldown', async function () {
