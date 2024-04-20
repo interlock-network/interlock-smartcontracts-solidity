@@ -7,18 +7,24 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract InterlockNetwork is
     Initializable,
     ERC20Upgradeable,
-    ERC20PausableUpgradeable,
     ERC20CappedUpgradeable,
-    OwnableUpgradeable
+    ERC20PausableUpgradeable,
+    AccessControlUpgradeable,
+    ERC20PermitUpgradeable
 {
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+
     uint256 public transferCooldownDuration;
     uint256 public transferCooldownThreshold;
     mapping(address => uint256) private _transferCooldowns;
@@ -33,6 +39,22 @@ contract InterlockNetwork is
         _disableInitializers();
     }
 
+    function initialize(address owner) public initializer {
+        __ERC20_init("InterlockNetwork", "ILOCK");
+        __ERC20Capped_init(1_000_000_000 ether);
+        __ERC20Pausable_init();
+        __AccessControl_init();
+        __ERC20Permit_init("InterlockNetwork");
+
+        _grantRole(DEFAULT_ADMIN_ROLE, owner);
+        _grantRole(PAUSER_ROLE, owner);
+        _grantRole(MINTER_ROLE, owner);
+        _grantRole(BURNER_ROLE, owner);
+
+        transferCooldownDuration = 1 days;
+        transferCooldownThreshold = 7_000_000 ether;
+    }
+
     modifier verifyCooldown(address from) {
         if (_transferCooldowns[from] >= block.timestamp) {
             revert InterlockTransferCooldown(from);
@@ -40,44 +62,31 @@ contract InterlockNetwork is
         _;
     }
 
-    function initialize(address initialOwner) public initializer {
-        uint256 CAP = 1_000_000_000 ether;
-        uint256 ARBITRUM_MINT = 700_000_000 ether;
-        uint256 INITIAL_COOLDOWN_DURATION = 1 days;
-        uint256 INITIAL_COOLDOWN_THRESHOLD = 7_000_000 ether;
-
-        __ERC20_init("InterlockNetwork", "ILOCK");
-        __ERC20Pausable_init();
-        __ERC20Capped_init(CAP);
-        __Ownable_init(initialOwner);
-
-        _mint(address(this), ARBITRUM_MINT);
-        _approve(address(this), initialOwner, CAP);
+    function pause() public onlyRole(PAUSER_ROLE) {
         _pause();
-
-        transferCooldownDuration = INITIAL_COOLDOWN_DURATION;
-        transferCooldownThreshold = INITIAL_COOLDOWN_THRESHOLD;
     }
 
-    function treasuryApprove(address spender, uint256 value) public onlyOwner {
-        _approve(address(this), spender, value);
+    function unpause() public onlyRole(PAUSER_ROLE) {
+        _unpause();
     }
 
     function setUpCooldown(
         uint256 duration,
         uint256 threshold
-    ) public onlyOwner {
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         transferCooldownDuration = duration;
         transferCooldownThreshold = threshold;
     }
 
-    function pause() public onlyOwner {
-        _pause();
+    function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+        _mint(to, amount);
     }
 
-    function unpause() public onlyOwner {
-        _unpause();
+    function burn(address from, uint256 amount) public onlyRole(BURNER_ROLE) {
+        _burn(from, amount);
     }
+
+    // The following functions are overrides required by Solidity.
 
     function _update(
         address from,
@@ -86,13 +95,15 @@ contract InterlockNetwork is
     )
         internal
         override(
+            ERC20CappedUpgradeable,
             ERC20Upgradeable,
-            ERC20PausableUpgradeable,
-            ERC20CappedUpgradeable
+            ERC20PausableUpgradeable
         )
         verifyCooldown(from)
     {
-        _evaluateCooldown(from, value);
+        if (from != address(0) && to != address(0) && !hasRole(DEFAULT_ADMIN_ROLE, from)) {
+            _evaluateCooldown(from, value);
+        }
         super._update(from, to, value);
     }
 
@@ -102,17 +113,11 @@ contract InterlockNetwork is
         if (
             cooldown > 0 &&
             threshold > 0 &&
-            value >= threshold &&
-            from != owner() &&
-            from != address(this)
+            value >= threshold
         ) {
             _transferCooldowns[from] = block.timestamp + cooldown;
         }
     }
 
-    /// @dev Gap for upgradeable storage. */
-    /// v2 - minus 32 bytes for transferCooldownDuration slot
-    /// v2 - minus 32 bytes for transferCooldownThreshold slot
-    /// v2 - minus 32 bytes for _transferCooldowns slot
-    uint256[97] public __gap;
+    uint256[100] public __gap;
 }

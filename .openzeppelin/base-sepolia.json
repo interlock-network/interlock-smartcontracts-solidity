@@ -2,23 +2,51 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xdA942D8df10fdC9Ec2Ca7c65Cb909E656947428a",
+      "address": "0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66",
+      "txHash": "0x42b1137a95f5d9457013a2d93a2d34728123882a20fd73d5e79c123041853301",
+      "remoteDeploymentId": "e39e12df-cfd3-4de9-9aa6-b75ea27dd385",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "d73edec4ecf8471fdbb66bfda4c8c85b5adc21f09916af1210a0fa18569c70a2": {
-      "address": "0x12F3C55E2c1385092b144E1fe5C0553b5BC99B49",
+    "dbbe6da1411b809a7956ad3b60384ea552a280a5e82c9a6299621f54d032b387": {
+      "address": "0x73bEdbb0C2c905F51d20E8acA39296AF6f1d05A0",
+      "txHash": "0x2e23d4a038a215fd10013424dfcaeb66a95a7cb931d2d25b993f7e0663d8b075",
+      "remoteDeploymentId": "e60f06c9-1214-4d6d-8f6e-ada89d4fecec",
       "layout": {
         "solcVersion": "0.8.20",
         "storage": [
           {
-            "label": "__gap",
+            "label": "transferCooldownDuration",
             "offset": 0,
             "slot": "0",
+            "type": "t_uint256",
+            "contract": "InterlockNetwork",
+            "src": "contracts/interlock.sol:28"
+          },
+          {
+            "label": "transferCooldownThreshold",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "InterlockNetwork",
+            "src": "contracts/interlock.sol:29"
+          },
+          {
+            "label": "_transferCooldowns",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "InterlockNetwork",
+            "src": "contracts/interlock.sol:30"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "3",
             "type": "t_array(t_uint256)100_storage",
             "contract": "InterlockNetwork",
-            "src": "contracts/ilockmvp_v1.sol:69"
+            "src": "contracts/interlock.sol:122"
           }
         ],
         "types": {
@@ -30,6 +58,14 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
           "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
             "label": "mapping(address => mapping(address => uint256))",
             "numberOfBytes": "32"
@@ -38,11 +74,57 @@
             "label": "mapping(address => uint256)",
             "numberOfBytes": "32"
           },
+          "t_mapping(t_bytes32,t_struct(RoleData)25_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
           "t_string_storage": {
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(ERC20CappedStorage)220_storage": {
+          "t_struct(AccessControlStorage)35_storage": {
+            "label": "struct AccessControlUpgradeable.AccessControlStorage",
+            "members": [
+              {
+                "label": "_roles",
+                "type": "t_mapping(t_bytes32,t_struct(RoleData)25_storage)",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(EIP712Storage)501_storage": {
+            "label": "struct EIP712Upgradeable.EIP712Storage",
+            "members": [
+              {
+                "label": "_hashedName",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_hashedVersion",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "_name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "_version",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(ERC20CappedStorage)253_storage": {
             "label": "struct ERC20CappedUpgradeable.ERC20CappedStorage",
             "members": [
               {
@@ -54,7 +136,7 @@
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(ERC20Storage)144_storage": {
+          "t_struct(ERC20Storage)176_storage": {
             "label": "struct ERC20Upgradeable.ERC20Storage",
             "members": [
               {
@@ -90,7 +172,7 @@
             ],
             "numberOfBytes": "160"
           },
-          "t_struct(InitializableStorage)64_storage": {
+          "t_struct(InitializableStorage)95_storage": {
             "label": "struct Initializable.InitializableStorage",
             "members": [
               {
@@ -108,19 +190,19 @@
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(OwnableStorage)14_storage": {
-            "label": "struct OwnableUpgradeable.OwnableStorage",
+          "t_struct(NoncesStorage)387_storage": {
+            "label": "struct NoncesUpgradeable.NoncesStorage",
             "members": [
               {
-                "label": "_owner",
-                "type": "t_address",
+                "label": "_nonces",
+                "type": "t_mapping(t_address,t_uint256)",
                 "offset": 0,
                 "slot": "0"
               }
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(PausableStorage)301_storage": {
+          "t_struct(PausableStorage)424_storage": {
             "label": "struct PausableUpgradeable.PausableStorage",
             "members": [
               {
@@ -131,6 +213,24 @@
               }
             ],
             "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)25_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "hasRole",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
           },
           "t_uint256": {
             "label": "uint256",
@@ -146,22 +246,56 @@
           }
         },
         "namespaces": {
-          "erc7201:openzeppelin.storage.Ownable": [
+          "erc7201:openzeppelin.storage.Nonces": [
             {
-              "contract": "OwnableUpgradeable",
-              "label": "_owner",
-              "type": "t_address",
-              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "contract": "NoncesUpgradeable",
+              "label": "_nonces",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable.sol:17",
               "offset": 0,
               "slot": "0"
             }
           ],
-          "erc7201:openzeppelin.storage.ERC20Capped": [
+          "erc7201:openzeppelin.storage.EIP712": [
             {
-              "contract": "ERC20CappedUpgradeable",
-              "label": "_cap",
-              "type": "t_uint256",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol:15",
+              "contract": "EIP712Upgradeable",
+              "label": "_hashedName",
+              "type": "t_bytes32",
+              "src": "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol:39",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "EIP712Upgradeable",
+              "label": "_hashedVersion",
+              "type": "t_bytes32",
+              "src": "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol:41",
+              "offset": 0,
+              "slot": "1"
+            },
+            {
+              "contract": "EIP712Upgradeable",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol:43",
+              "offset": 0,
+              "slot": "2"
+            },
+            {
+              "contract": "EIP712Upgradeable",
+              "label": "_version",
+              "type": "t_string_storage",
+              "src": "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol:44",
+              "offset": 0,
+              "slot": "3"
+            }
+          ],
+          "erc7201:openzeppelin.storage.AccessControl": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)25_storage)",
+              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:61",
               "offset": 0,
               "slot": "0"
             }
@@ -172,6 +306,16 @@
               "label": "_paused",
               "type": "t_bool",
               "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.ERC20Capped": [
+            {
+              "contract": "ERC20CappedUpgradeable",
+              "label": "_cap",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol:15",
               "offset": 0,
               "slot": "0"
             }

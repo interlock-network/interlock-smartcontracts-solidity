@@ -35,16 +35,26 @@ const config: HardhatUserConfig = {
       url: 'https://rpc2.sepolia.org',
       chainId: 11155111
     },
-    arbitrumSepolia: {
-      url: 'https://sepolia-rollup.arbitrum.io/rpc',
-      chainId: 421614
+    baseSepolia: {
+      url: 'https://sepolia.base.org',
+      chainId: 84532
     }
   },
   etherscan: {
     apiKey: {
       sepolia: process.env.ETHERSCAN_APIKEY as string,
-      arbitrumSepolia: process.env.ARBITRUM_APIKEY as string
-    }
+      baseSepolia: process.env.BASE_APIKEY as string
+    },
+    customChains: [
+      {
+        network: 'baseSepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org'
+        }
+      }
+    ]
   },
   solidity: {
     compilers: [

@@ -5,10 +5,10 @@ const contractsAddresses: Record<
   }
 > = {
   sepolia: {
-    InterlockNetwork: '0x4B4Ee17F14dFcA4d09fF3312f5733360134EA34D'
+    InterlockNetwork: '0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66'
   },
-  arbitrumSepolia: {
-    InterlockNetwork: '0xdA942D8df10fdC9Ec2Ca7c65Cb909E656947428a'
+  baseSepolia: {
+    InterlockNetwork: '0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66'
   }
 }
 
