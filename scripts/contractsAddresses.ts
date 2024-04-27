@@ -9,6 +9,9 @@ const contractsAddresses: Record<
   },
   baseSepolia: {
     InterlockNetwork: '0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66'
+  },
+  arbitrumSepolia: {
+    InterlockNetwork: '0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66'
   }
 }
 
