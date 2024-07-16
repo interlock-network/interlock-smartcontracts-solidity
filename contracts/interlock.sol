@@ -1,5 +1,4 @@
 // INTERLOCK NETWORK ILOCK SOLIDITY CONTRACT
-// Version v2
 
 // SPDX-License-Identifier: MIT
 // Compatible with OpenZeppelin Contracts ^5.0.0
@@ -24,6 +23,7 @@ contract InterlockNetwork is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+    bytes32 public constant COOLDOWN_WHITELISTED = keccak256("COOLDOWN_WHITELISTED");
 
     uint256 public transferCooldownDuration;
     uint256 public transferCooldownThreshold;
@@ -50,9 +50,10 @@ contract InterlockNetwork is
         _grantRole(PAUSER_ROLE, owner);
         _grantRole(MINTER_ROLE, owner);
         _grantRole(BURNER_ROLE, owner);
+        _grantRole(COOLDOWN_WHITELISTED, owner);
 
         transferCooldownDuration = 1 days;
-        transferCooldownThreshold = 7_000_000 ether;
+        transferCooldownThreshold = 10_000_000 ether;
     }
 
     modifier verifyCooldown(address from) {
@@ -101,7 +102,7 @@ contract InterlockNetwork is
         )
         verifyCooldown(from)
     {
-        if (from != address(0) && to != address(0) && !hasRole(DEFAULT_ADMIN_ROLE, from)) {
+        if (from != address(0) && to != address(0) && !hasRole(COOLDOWN_WHITELISTED, from)) {
             _evaluateCooldown(from, value);
         }
         super._update(from, to, value);

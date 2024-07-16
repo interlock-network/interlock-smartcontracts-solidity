@@ -7,5 +7,5 @@ export const ilockSettings = {
   initialSupply: ethers.parseUnits((0).toString(), 18),
   cap: ethers.parseUnits((1_000_000_000).toString(), 18),
   cooldownDuration: 60 * 60 * 24, // 1 day
-  cooldownThreshold: ethers.parseUnits((7_000_000).toString(), 18)
+  cooldownThreshold: ethers.parseUnits((10_000_000).toString(), 18)
 }
