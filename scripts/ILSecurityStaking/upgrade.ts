@@ -2,7 +2,7 @@ import { proposeUpgradeWithDefenderInteractive } from '../utils'
 import { network } from 'hardhat'
 import { contractsAddresses } from '../../contracts-data/addresses'
 
-const contractName = 'InterlockNetwork'
+const contractName = 'ILSecurityStaking'
 
 async function main() {
   const proxyAddress = contractsAddresses[network.name][contractName]
