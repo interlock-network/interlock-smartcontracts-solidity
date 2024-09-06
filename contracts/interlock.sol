@@ -8,8 +8,8 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract InterlockNetwork is
@@ -23,7 +23,8 @@ contract InterlockNetwork is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
-    bytes32 public constant COOLDOWN_WHITELISTED = keccak256("COOLDOWN_WHITELISTED");
+    bytes32 public constant COOLDOWN_WHITELISTED =
+        keccak256("COOLDOWN_WHITELISTED");
 
     uint256 public transferCooldownDuration;
     uint256 public transferCooldownThreshold;
@@ -102,7 +103,11 @@ contract InterlockNetwork is
         )
         verifyCooldown(from)
     {
-        if (from != address(0) && to != address(0) && !hasRole(COOLDOWN_WHITELISTED, from)) {
+        if (
+            from != address(0) &&
+            to != address(0) &&
+            !hasRole(COOLDOWN_WHITELISTED, from)
+        ) {
             _evaluateCooldown(from, value);
         }
         super._update(from, to, value);
@@ -111,11 +116,7 @@ contract InterlockNetwork is
     function _evaluateCooldown(address from, uint256 value) private {
         uint256 cooldown = transferCooldownDuration;
         uint256 threshold = transferCooldownThreshold;
-        if (
-            cooldown > 0 &&
-            threshold > 0 &&
-            value >= threshold
-        ) {
+        if (cooldown > 0 && threshold > 0 && value >= threshold) {
             _transferCooldowns[from] = block.timestamp + cooldown;
         }
     }
