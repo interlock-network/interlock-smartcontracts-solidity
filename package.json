@@ -4,6 +4,7 @@
     "clean": "hardhat clean",
     "compile": "hardhat compile",
     "format": "prettier --write \"**/*.ts\" \"contracts/**/*.sol\"",
+    "format:check": "prettier --check \"**/*.ts\" \"contracts/**/*.sol\"",
     "lint": "solhint \"contracts/**/*.sol\"",
     "verify": "hardhat verify",
     "test": "hardhat compile && hardhat test"
@@ -12,12 +13,15 @@
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
     "@nomicfoundation/hardhat-verify": "^2.0.6",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.0.5",
     "@openzeppelin/upgrades-core": "^1.32.6",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.3.14",
     "@types/mocha": "^10.0.6",
+    "chai": "^4.4.1",
     "dotenv": "^16.4.5",
     "ethers": "^6.12.0",
     "hardhat": "^2.22.3",
@@ -32,10 +36,5 @@
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
     "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2",
-    "@openzeppelin/contracts-upgradeable": "^5.0.2",
-    "chai": "^4.4.1"
   }
 }

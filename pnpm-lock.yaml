@@ -7,16 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@openzeppelin/contracts':
-        specifier: ^5.0.2
-        version: 5.0.2
-      '@openzeppelin/contracts-upgradeable':
-        specifier: ^5.0.2
-        version: 5.0.2(@openzeppelin/contracts@5.0.2)
-      chai:
-        specifier: ^4.4.1
-        version: 4.4.1
     devDependencies:
       '@nomicfoundation/hardhat-chai-matchers':
         specifier: ^2.0.6
@@ -27,6 +17,12 @@ importers:
       '@nomicfoundation/hardhat-verify':
         specifier: ^2.0.6
         version: 2.0.6(hardhat@2.22.3(ts-node@10.9.2(@types/node@20.12.7)(typescript@5.4.5))(typescript@5.4.5))
+      '@openzeppelin/contracts':
+        specifier: ^5.0.2
+        version: 5.0.2
+      '@openzeppelin/contracts-upgradeable':
+        specifier: ^5.0.2
+        version: 5.0.2(@openzeppelin/contracts@5.0.2)
       '@openzeppelin/hardhat-upgrades':
         specifier: ^3.0.5
         version: 3.0.5(@nomicfoundation/hardhat-ethers@3.0.5(ethers@6.12.0)(hardhat@2.22.3(ts-node@10.9.2(@types/node@20.12.7)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/hardhat-verify@2.0.6(hardhat@2.22.3(ts-node@10.9.2(@types/node@20.12.7)(typescript@5.4.5))(typescript@5.4.5)))(ethers@6.12.0)(hardhat@2.22.3(ts-node@10.9.2(@types/node@20.12.7)(typescript@5.4.5))(typescript@5.4.5))
@@ -45,6 +41,9 @@ importers:
       '@types/mocha':
         specifier: ^10.0.6
         version: 10.0.6
+      chai:
+        specifier: ^4.4.1
+        version: 4.4.1
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5

@@ -1,12 +1,13 @@
 {
   "manifestVersion": "3.2",
   "proxies": [
-    {
-      "address": "0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66",
-      "txHash": "0x22d5fabaf32a6a0c13d0fee4a2b1e9d6236ad148f67bdc62fbcb9a4bb394ad3a",
-      "remoteDeploymentId": "f1e6dd8a-280c-46f5-8cd8-17d3a6c4f8c0",
-      "kind": "transparent"
-    },
+    // Dumped versions
+    // {
+    //   "address": "0x6557fc061BBFfC9BB0a5EeFC9656Bb22e4f8eF66",
+    //   "txHash": "0x22d5fabaf32a6a0c13d0fee4a2b1e9d6236ad148f67bdc62fbcb9a4bb394ad3a",
+    //   "remoteDeploymentId": "f1e6dd8a-280c-46f5-8cd8-17d3a6c4f8c0",
+    //   "kind": "transparent"
+    // },
     {
       "address": "0xeF75DBdCc16416F534Cd710251a1Ed930aa849e8",
       "txHash": "0x84d34030a79882b9dc80d98381ab9982be63381bf50be483eb7667c470531698",

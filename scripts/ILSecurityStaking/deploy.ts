@@ -7,13 +7,13 @@ const contractName = 'ILSecurityStaking'
 async function main() {
   const { proxyAdminOwner, params } = contractsArgs[network.name][contractName]
 
-  if (!params.ilockToken) {
-    throw new Error(`ILock token address is not set for the ${contractName} on ${network.name} network`)
+  if (!params._ilockToken) {
+    throw new Error(`ILOCK token address is not set for the ${contractName} on ${network.name} network`)
   }
-  if (!params.stakingPool) {
+  if (!params._stakingPool) {
     throw new Error(`Staking pool address is not set for the ${contractName} on ${network.name} network`)
   }
-  if (!params.admin) {
+  if (!params._admin) {
     throw new Error(`Admin address is not set for the ${contractName} on ${network.name} network`)
   }
 
