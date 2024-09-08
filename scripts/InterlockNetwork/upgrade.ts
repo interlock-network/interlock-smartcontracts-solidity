@@ -1,6 +1,6 @@
 import { proposeUpgradeWithDefenderInteractive } from '../utils'
 import { network } from 'hardhat'
-import contractsAddresses from '../contractsAddresses'
+import { contractsAddresses } from '../../contracts-data/addresses'
 
 const contractName = 'InterlockNetwork'
 

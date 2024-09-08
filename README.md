@@ -6,27 +6,37 @@ Welcome! This repo hosts development of all solidity smart contracts that actual
 
 Contracts are written in solidity and are currently hosted on the [Arbitrum blockchain](https://arbitrum.io).
 
-## SECURITY NOTICE:
-
-If you find something wrong or concerning, open an issue. If the finding is a sensitive security concern, then for now the best course of action is to email smartcontract POC Blair Munro directly, or reach out on discord: [blair@interlock.network](mailto:blair@interlock.network) & @blairmunroakusa.
-
 ## Multichain:
 
 Interlock Network has been and always will be, blockchain agnostic. The first phase of our web3 launch involves positioning for future security staking, as well as maximizing the likelihood of successful token value hike.
 
-The ILOCK token will span two ecosystems as mentioned: Polkadot (the Aleph Zero Substrate fork), and Ethereum (the Arbitrum layer 2 EVM). Vesting and rewards will be maintained on both. Security staking will likely exist primarily on Aleph Zero, due to the superior transaction fee and throughput metrics. If security staking does NOT need to be high-frequency, then we may also implement on Arbitrum.
-
-The choice in these two chains has been informed by active work being done to bridge the two ecosystems. We would not have chosen these chains to launch if we did not know that there would be a bridge in the near future.
+The ILOCK token will be deployed on Ethereum's Arbitrum layer 2 EVM. Vesting and rewards will be maintained on this network. Security staking will be implemented on Arbitrum, taking advantage of its improved transaction fees and throughput compared to the Ethereum mainnet.
 
 ## Contracts:
 
-#### [$ILOCK](./ilockmvp.sol)
+#### InterlockNetwork
 
-This is our EVM (ERC20) token contract written for [Arbitrum](https://arbitrum.io). Vesting will be managed in external contracts provided by [TokenOps](https://tokenops.xyz). This contract employs Solidity, drawing directly from the standard (audited) OpenZeppelin 5 contract suite. To avoid needing to perform a new audit, reward functionality will simply employ the `TransferFrom` ERC20 standard method.
+This is our EVM (ERC20) token contract written for [Arbitrum](https://arbitrum.io). It implements the ILOCK token with the following features:
+- Standard ERC20 functionality
+- Pausable operations for emergency situations
+- Role-based access control for administrative functions
+- Cooldown mechanism for large transfers
+
+The contract employs Solidity, drawing directly from the standard (audited) OpenZeppelin 5 contract suite.
+
+#### ILSecurityStaking
+
+This contract manages the security staking mechanism for the ThreatSlayer and ILOCK token. Key features include:
+- Voting on malicious/non-malicious urls
+- Locking ILOCK tokens for staking
+- Reward distribution
+- Slashing mechanism for misbehavior
+
+Both contracts are designed to be upgradeable, allowing for future improvements and additions to functionality while maintaining contract addresses and state.
 
 ## Extra and other:
 
-We have enabled [discussions](https://github.com/interlock-network/interlock-smartcontracts-solidity/discussions) and will be open to feedback throughout the development process. Please feel free to chime in on a discussion or open an [issue](https://github.com/interlock-network/interlock-smartcontracts-solidity/issues), or reach out directly to blockchain engineer @blairmunroakusa on TG, Discord, or Github.
+We have enabled [discussions](https://github.com/interlock-network/interlock-smartcontracts-solidity/discussions) and will be open to feedback throughout the development process. Please feel free to chime in on a discussion or open an [issue](https://github.com/interlock-network/interlock-smartcontracts-solidity/issues).
 
 Likewise, feel free to comment on issues as they come up. We use an org-wide labeling system, but will have specific labels for this repository to denote contract type, client tooling, etc.
 

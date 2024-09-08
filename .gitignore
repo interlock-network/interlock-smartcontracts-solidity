@@ -9,9 +9,7 @@ node_modules
 coverage
 coverage.json
 typechain
-
-# don't push the environment vars!
-.env
+typechain-types
 
 # Built application files
 .DS*
@@ -97,7 +95,7 @@ contracts/test/fuzzing/crytic-export
 *.swo
 *.swn
 *.swm
+
+# don't push the environment vars!
 .env.*
 !.env.template
-
-typechain-types

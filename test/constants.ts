@@ -9,3 +9,8 @@ export const ilockSettings = {
   cooldownDuration: 60 * 60 * 24, // 1 day
   cooldownThreshold: ethers.parseUnits((10_000_000).toString(), 18)
 }
+
+export const securityStakingSettings = {
+  name: 'ILSecurityStaking',
+  version: '1'
+}

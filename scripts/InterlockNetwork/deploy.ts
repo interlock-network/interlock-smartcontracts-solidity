@@ -1,4 +1,4 @@
-import contractsArgs from '../contractsArgs'
+import { contractsArgs } from '../../contracts-data/args'
 import { network } from 'hardhat'
 import { deployProxyWithDefenderInteractive } from '../utils'
 
