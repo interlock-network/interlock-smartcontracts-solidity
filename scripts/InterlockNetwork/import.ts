@@ -1,5 +1,5 @@
 import { ethers, network, upgrades } from 'hardhat'
-import contractsAddresses from '../contractsAddresses'
+import { contractsAddresses } from '../../contracts-data/addresses'
 
 const contractName = 'InterlockNetwork'
 

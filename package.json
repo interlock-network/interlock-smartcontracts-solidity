@@ -24,7 +24,7 @@
     "chai": "^4.4.1",
     "dotenv": "^16.4.5",
     "ethers": "^6.12.0",
-    "hardhat": "^2.22.3",
+    "hardhat": "^2.22.10",
     "hardhat-abi-exporter": "^2.10.1",
     "hardhat-gas-reporter": "^1.0.10",
     "mocha": "^10.4.0",

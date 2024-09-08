@@ -100,11 +100,11 @@ contract ILSecurityStaking is
 
     function stakeOnNonMalicious(
         uint256 _amount,
-        bytes32 _dataHash,
+        bytes32 _urlHash,
         bytes memory _signature
     ) external nonReentrant onlyNotZeroStake(_amount) {
-        _verifySignature(_amount, _dataHash, false, _signature);
-        _stake(_amount, _dataHash, false);
+        _verifySignature(_amount, _urlHash, false, _signature);
+        _stake(_amount, _urlHash, false);
     }
 
     function setStakingPool(

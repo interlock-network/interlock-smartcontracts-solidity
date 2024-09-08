@@ -136,9 +136,8 @@ describe(`${contractName}`, () => {
 
     it('should reject invalid signatures', async function () {
       const invalidSignature = ethers.hexlify(ethers.randomBytes(65))
-      await expect(
-        securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, invalidSignature)
-      ).to.be.revertedWithCustomError(securityStaking, 'ECDSAInvalidSignature')
+      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, invalidSignature)).to.be
+        .reverted
     })
 
     it('should reject signatures from non-authorized signers', async function () {

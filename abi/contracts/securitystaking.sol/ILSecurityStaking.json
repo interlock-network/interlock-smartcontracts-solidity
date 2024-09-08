@@ -555,7 +555,7 @@
       },
       {
         "internalType": "bytes32",
-        "name": "_dataHash",
+        "name": "_urlHash",
         "type": "bytes32"
       },
       {
