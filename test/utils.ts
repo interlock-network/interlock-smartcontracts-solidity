@@ -1,5 +1,4 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers'
-import { ethers } from 'hardhat'
 
 export async function signStakeMessage(
   signer: SignerWithAddress,
