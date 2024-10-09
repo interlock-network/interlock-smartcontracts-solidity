@@ -6,9 +6,7 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -16,16 +14,15 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 contract ILSecurityStaking is
     Initializable,
     AccessControlUpgradeable,
-    ReentrancyGuardUpgradeable,
     EIP712Upgradeable
 {
-    using SafeERC20 for IERC20;
-
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant SIGNER_ROLE = keccak256("SIGNER_ROLE");
 
     bytes32 private constant STAKE_TYPEHASH =
-        keccak256("Stake(uint256 amount,bytes32 dataHash,bool isMalicious)");
+        keccak256(
+            "Stake(uint256 amount,bytes32 urlHash,bool isMalicious,uint256 deadline)"
+        );
 
     IERC20 public ilockToken;
     address public stakingPool;
@@ -40,20 +37,26 @@ contract ILSecurityStaking is
 
     event StakedOnMalicious(
         address indexed staker,
-        bytes32 indexed dataHash,
+        bytes32 indexed urlHash,
         uint256 amount
     );
     event StakedOnNonMalicious(
         address indexed staker,
-        bytes32 indexed dataHash,
+        bytes32 indexed urlHash,
         uint256 amount
     );
 
     error ZeroStakeAmount();
     error UnauthorizedSigner();
+    error SignatureExpired();
 
     modifier onlyNotZeroStake(uint256 _amount) {
         if (_amount == 0) revert ZeroStakeAmount();
+        _;
+    }
+
+    modifier onlyBeforeDeadline(uint256 _deadline) {
+        if (block.timestamp > _deadline) revert SignatureExpired();
         _;
     }
 
@@ -68,7 +71,6 @@ contract ILSecurityStaking is
         address _admin
     ) public initializer {
         __AccessControl_init();
-        __ReentrancyGuard_init();
         __EIP712_init("ILSecurityStaking", "1");
 
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
@@ -79,31 +81,43 @@ contract ILSecurityStaking is
         stakingPool = _stakingPool;
     }
 
-    function getStake(
-        bytes32 _dataHash,
-        bool _isMalicious
-    ) public view returns (Stake memory) {
-        return
-            _isMalicious
-                ? stakesOnMalicious[_dataHash]
-                : stakesOnNonMalicious[_dataHash];
+    // solhint-disable-next-line func-name-mixedcase
+    function DOMAIN_SEPARATOR() external view virtual returns (bytes32) {
+        return _domainSeparatorV4();
+    }
+
+    function hashStakeData(
+        uint256 _amount,
+        bytes32 _urlHash,
+        bool _isMalicious,
+        uint256 _deadline
+    ) external pure returns (bytes32) {
+        return _hashStakeData(_amount, _urlHash, _isMalicious, _deadline);
     }
 
     function stakeOnMalicious(
         uint256 _amount,
         bytes32 _urlHash,
-        bytes memory _signature
-    ) external nonReentrant onlyNotZeroStake(_amount) {
-        _verifySignature(_amount, _urlHash, true, _signature);
+        uint256 _deadline,
+        bytes calldata _signature
+    ) external onlyNotZeroStake(_amount) onlyBeforeDeadline(_deadline) {
+        _verifySignature(
+            _hashStakeData(_amount, _urlHash, true, _deadline),
+            _signature
+        );
         _stake(_amount, _urlHash, true);
     }
 
     function stakeOnNonMalicious(
         uint256 _amount,
         bytes32 _urlHash,
-        bytes memory _signature
-    ) external nonReentrant onlyNotZeroStake(_amount) {
-        _verifySignature(_amount, _urlHash, false, _signature);
+        uint256 _deadline,
+        bytes calldata _signature
+    ) external onlyNotZeroStake(_amount) onlyBeforeDeadline(_deadline) {
+        _verifySignature(
+            _hashStakeData(_amount, _urlHash, false, _deadline),
+            _signature
+        );
         _stake(_amount, _urlHash, false);
     }
 
@@ -113,39 +127,62 @@ contract ILSecurityStaking is
         stakingPool = _newStakingPool;
     }
 
+    function getStake(
+        bytes32 _urlHash,
+        bool _isMalicious
+    ) public view returns (Stake memory) {
+        return
+            _isMalicious
+                ? stakesOnMalicious[_urlHash]
+                : stakesOnNonMalicious[_urlHash];
+    }
+
     function _stake(
         uint256 _amount,
-        bytes32 _dataHash,
+        bytes32 _urlHash,
         bool _isMalicious
     ) private {
-        ilockToken.safeTransferFrom(msg.sender, stakingPool, _amount);
+        ilockToken.transferFrom(msg.sender, stakingPool, _amount);
 
         Stake memory newStake = Stake({staker: msg.sender, amount: _amount});
 
         if (_isMalicious) {
-            stakesOnMalicious[_dataHash] = newStake;
-            emit StakedOnMalicious(msg.sender, _dataHash, _amount);
+            stakesOnMalicious[_urlHash] = newStake;
+            emit StakedOnMalicious(msg.sender, _urlHash, _amount);
         } else {
-            stakesOnNonMalicious[_dataHash] = newStake;
-            emit StakedOnNonMalicious(msg.sender, _dataHash, _amount);
+            stakesOnNonMalicious[_urlHash] = newStake;
+            emit StakedOnNonMalicious(msg.sender, _urlHash, _amount);
         }
     }
 
     function _verifySignature(
-        uint256 _amount,
-        bytes32 _dataHash,
-        bool _isMalicious,
-        bytes memory _signature
+        bytes32 structHash,
+        bytes calldata _signature
     ) private view {
-        bytes32 structHash = keccak256(
-            abi.encode(STAKE_TYPEHASH, _amount, _dataHash, _isMalicious)
-        );
         bytes32 hash = _hashTypedDataV4(structHash);
         address signer = ECDSA.recover(hash, _signature);
 
         if (!hasRole(SIGNER_ROLE, signer)) {
             revert UnauthorizedSigner();
         }
+    }
+
+    function _hashStakeData(
+        uint256 _amount,
+        bytes32 _urlHash,
+        bool _isMalicious,
+        uint256 _deadline
+    ) private pure returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    STAKE_TYPEHASH,
+                    _amount,
+                    _urlHash,
+                    _isMalicious,
+                    _deadline
+                )
+            );
     }
 
     uint256[50] private __gap;

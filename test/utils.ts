@@ -1,19 +1,21 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers'
 
+export const securityStakingTypes = {
+  Stake: [
+    { name: 'amount', type: 'uint256' },
+    { name: 'urlHash', type: 'bytes32' },
+    { name: 'isMalicious', type: 'bool' },
+    { name: 'deadline', type: 'uint256' }
+  ]
+}
+
 export async function signStakeMessage(
   signer: SignerWithAddress,
+  domain: any,
   amount: bigint,
-  dataHash: string,
+  urlHash: string,
   isMalicious: boolean,
-  domain: any
+  deadline: number
 ) {
-  const types = {
-    Stake: [
-      { name: 'amount', type: 'uint256' },
-      { name: 'dataHash', type: 'bytes32' },
-      { name: 'isMalicious', type: 'bool' }
-    ]
-  }
-  const value = { amount, dataHash, isMalicious }
-  return signer.signTypedData(domain, types, value)
+  return signer.signTypedData(domain, securityStakingTypes, { amount, urlHash, isMalicious, deadline })
 }
