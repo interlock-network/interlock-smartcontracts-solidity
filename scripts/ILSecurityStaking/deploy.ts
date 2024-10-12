@@ -5,7 +5,7 @@ import { deployProxyWithDefenderInteractive } from '../utils'
 const contractName = 'ILSecurityStaking'
 
 async function main() {
-  const { proxyAdminOwner, params } = contractsArgs[network.name][contractName]
+  const { params } = contractsArgs[network.name][contractName]
 
   if (!params._ilockToken) {
     throw new Error(`ILOCK token address is not set for the ${contractName} on ${network.name} network`)
@@ -17,7 +17,7 @@ async function main() {
     throw new Error(`Admin address is not set for the ${contractName} on ${network.name} network`)
   }
 
-  await deployProxyWithDefenderInteractive(contractName, params, { proxyAdminOwner })
+  await deployProxyWithDefenderInteractive(contractName, params, { initializerName: 'initialize' })
 }
 
 // We recommend this pattern to be able to use async/await everywhere

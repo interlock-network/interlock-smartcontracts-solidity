@@ -13,8 +13,7 @@ const sepoliaArgs = {
       _ilockToken: sepoliaAddresses['InterlockNetwork'],
       _stakingPool: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
       _admin: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
-    },
-    proxyAdminOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+    }
   }
 }
 
@@ -31,8 +30,7 @@ const baseSepoliaArgs = {
       _ilockToken: baseSepoliaAddresses['InterlockNetwork'],
       _stakingPool: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
       _admin: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
-    },
-    proxyAdminOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+    }
   }
 }
 
@@ -49,8 +47,7 @@ const arbitrumSepoliaArgs = {
       _ilockToken: arbitrumSepoliaAddresses['InterlockNetwork'],
       _stakingPool: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
       _admin: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
-    },
-    proxyAdminOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+    }
   }
 }
 
