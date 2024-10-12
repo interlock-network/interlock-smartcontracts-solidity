@@ -26,6 +26,17 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      }
+    ],
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "ECDSAInvalidSignature",
     "type": "error"
@@ -53,8 +64,34 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "ERC1967InvalidImplementation",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ERC1967NonPayable",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FailedInnerCall",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "InvalidInitialization",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidNonce",
     "type": "error"
   },
   {
@@ -65,6 +102,22 @@
   {
     "inputs": [],
     "name": "SignatureExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UUPSUnauthorizedCallContext",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "slot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "UUPSUnsupportedProxiableUUID",
     "type": "error"
   },
   {
@@ -183,8 +236,14 @@
       {
         "indexed": true,
         "internalType": "bytes32",
-        "name": "urlHash",
+        "name": "dataHash",
         "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -208,8 +267,14 @@
       {
         "indexed": true,
         "internalType": "bytes32",
-        "name": "urlHash",
+        "name": "dataHash",
         "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -219,6 +284,19 @@
       }
     ],
     "name": "StakedOnNonMalicious",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
     "type": "event"
   },
   {
@@ -275,6 +353,32 @@
   },
   {
     "inputs": [],
+    "name": "UPGRADER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UPGRADE_INTERFACE_VERSION",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "eip712Domain",
     "outputs": [
       {
@@ -320,6 +424,30 @@
     "inputs": [
       {
         "internalType": "bytes32",
+        "name": "_dataHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isMalicious",
+        "type": "bool"
+      }
+    ],
+    "name": "getNonce",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
         "name": "role",
         "type": "bytes32"
       }
@@ -339,7 +467,7 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "_urlHash",
+        "name": "_dataHash",
         "type": "bytes32"
       },
       {
@@ -360,6 +488,11 @@
           {
             "internalType": "uint256",
             "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nonce",
             "type": "uint256"
           }
         ],
@@ -422,13 +555,18 @@
       },
       {
         "internalType": "bytes32",
-        "name": "_urlHash",
+        "name": "_dataHash",
         "type": "bytes32"
       },
       {
         "internalType": "bool",
         "name": "_isMalicious",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nonce",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -481,6 +619,19 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -541,8 +692,13 @@
       },
       {
         "internalType": "bytes32",
-        "name": "_urlHash",
+        "name": "_dataHash",
         "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nonce",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -569,8 +725,13 @@
       },
       {
         "internalType": "bytes32",
-        "name": "_urlHash",
+        "name": "_dataHash",
         "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nonce",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -607,6 +768,11 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -630,6 +796,11 @@
       {
         "internalType": "uint256",
         "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
         "type": "uint256"
       }
     ],
@@ -666,6 +837,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   }
 ]
