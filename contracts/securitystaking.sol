@@ -67,8 +67,14 @@ contract ILSecurityStaking is
         _;
     }
 
-    modifier onlyValidNonce(bytes32 _dataHash, bool _isMalicious, uint256 _nonce) {
-        Stake memory currentStake = _isMalicious ? stakesOnMalicious[_dataHash] : stakesOnNonMalicious[_dataHash];
+    modifier onlyValidNonce(
+        bytes32 _dataHash,
+        bool _isMalicious,
+        uint256 _nonce
+    ) {
+        Stake memory currentStake = _isMalicious
+            ? stakesOnMalicious[_dataHash]
+            : stakesOnNonMalicious[_dataHash];
         if (_nonce != currentStake.nonce + 1) revert InvalidNonce();
         _;
     }
@@ -90,7 +96,7 @@ contract ILSecurityStaking is
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
         _grantRole(ADMIN_ROLE, _admin);
         _grantRole(SIGNER_ROLE, _admin);
-        _grantRole(UPGRADER_ROLE, _admin);  // Grant UPGRADER_ROLE to admin
+        _grantRole(UPGRADER_ROLE, _admin);
 
         ilockToken = IERC20(_ilockToken);
         stakingPool = _stakingPool;
@@ -108,7 +114,8 @@ contract ILSecurityStaking is
         uint256 _nonce,
         uint256 _deadline
     ) external pure returns (bytes32) {
-        return _hashStakeData(_amount, _dataHash, _isMalicious, _nonce, _deadline);
+        return
+            _hashStakeData(_amount, _dataHash, _isMalicious, _nonce, _deadline);
     }
 
     function stakeOnMalicious(
@@ -117,8 +124,9 @@ contract ILSecurityStaking is
         uint256 _nonce,
         uint256 _deadline,
         bytes calldata _signature
-    ) external 
-        onlyNotZeroStake(_amount) 
+    )
+        external
+        onlyNotZeroStake(_amount)
         onlyBeforeDeadline(_deadline)
         onlyValidNonce(_dataHash, true, _nonce)
     {
@@ -135,8 +143,9 @@ contract ILSecurityStaking is
         uint256 _nonce,
         uint256 _deadline,
         bytes calldata _signature
-    ) external 
-        onlyNotZeroStake(_amount) 
+    )
+        external
+        onlyNotZeroStake(_amount)
         onlyBeforeDeadline(_deadline)
         onlyValidNonce(_dataHash, false, _nonce)
     {
@@ -163,7 +172,10 @@ contract ILSecurityStaking is
                 : stakesOnNonMalicious[_dataHash];
     }
 
-    function getNonce(bytes32 _dataHash, bool _isMalicious) public view returns (uint256) {
+    function getNonce(
+        bytes32 _dataHash,
+        bool _isMalicious
+    ) public view returns (uint256) {
         Stake memory stake = _isMalicious
             ? stakesOnMalicious[_dataHash]
             : stakesOnNonMalicious[_dataHash];
@@ -225,11 +237,9 @@ contract ILSecurityStaking is
             );
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyRole(UPGRADER_ROLE)
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyRole(UPGRADER_ROLE) {}
 
     uint256[50] private __gap;
 }

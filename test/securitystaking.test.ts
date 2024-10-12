@@ -93,7 +93,15 @@ describe(`${contractName}`, () => {
 
     it('should allow staking on malicious data', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, nonce, deadline)
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        nonce,
+        deadline
+      )
       await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
         .to.emit(securityStaking, 'StakedOnMalicious')
         .withArgs(staker.address, dataHash, nonce, STAKE_AMOUNT)
@@ -101,15 +109,33 @@ describe(`${contractName}`, () => {
 
     it('should allow staking on non-malicious data', async function () {
       const nonce = await securityStaking.getNonce(dataHash, false)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, false, nonce, deadline)
-      await expect(securityStaking.connect(staker).stakeOnNonMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        false,
+        nonce,
+        deadline
+      )
+      await expect(
+        securityStaking.connect(staker).stakeOnNonMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature)
+      )
         .to.emit(securityStaking, 'StakedOnNonMalicious')
         .withArgs(staker.address, dataHash, nonce, STAKE_AMOUNT)
     })
 
     it('should emit correct events when staking', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, nonce, deadline)
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        nonce,
+        deadline
+      )
       await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
         .to.emit(securityStaking, 'StakedOnMalicious')
         .withArgs(staker.address, dataHash, nonce, STAKE_AMOUNT)
@@ -117,7 +143,15 @@ describe(`${contractName}`, () => {
 
     it('should record stake correctly', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, nonce, deadline)
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        nonce,
+        deadline
+      )
       await securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature)
 
       const stake = await securityStaking.getStake(dataHash, true)
@@ -152,7 +186,15 @@ describe(`${contractName}`, () => {
 
     it('should allow staking on malicious data with correct nonce', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, nonce, deadline)
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        nonce,
+        deadline
+      )
       await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
         .to.emit(securityStaking, 'StakedOnMalicious')
         .withArgs(staker.address, dataHash, nonce, STAKE_AMOUNT)
@@ -160,8 +202,18 @@ describe(`${contractName}`, () => {
 
     it('should allow staking on non-malicious data with correct nonce', async function () {
       const nonce = await securityStaking.getNonce(dataHash, false)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, false, nonce, deadline)
-      await expect(securityStaking.connect(staker).stakeOnNonMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        false,
+        nonce,
+        deadline
+      )
+      await expect(
+        securityStaking.connect(staker).stakeOnNonMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature)
+      )
         .to.emit(securityStaking, 'StakedOnNonMalicious')
         .withArgs(staker.address, dataHash, nonce, STAKE_AMOUNT)
     })
@@ -169,14 +221,31 @@ describe(`${contractName}`, () => {
     it('should reject staking with incorrect nonce', async function () {
       const correctNonce = await securityStaking.getNonce(dataHash, true)
       const incorrectNonce = correctNonce + 1n
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, incorrectNonce, deadline)
-      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, incorrectNonce, deadline, signature))
-        .to.be.revertedWithCustomError(securityStaking, 'InvalidNonce')
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        incorrectNonce,
+        deadline
+      )
+      await expect(
+        securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, incorrectNonce, deadline, signature)
+      ).to.be.revertedWithCustomError(securityStaking, 'InvalidNonce')
     })
 
     it('should increment nonce after successful stake', async function () {
       const initialNonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, initialNonce, deadline)
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        initialNonce,
+        deadline
+      )
       await securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, initialNonce, deadline, signature)
       const newNonce = await securityStaking.getNonce(dataHash, true)
       expect(newNonce).to.equal(initialNonce + 1n)
@@ -188,16 +257,25 @@ describe(`${contractName}`, () => {
 
     it('should accept valid signatures', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, nonce, deadline)
-      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature)).to.not
-        .be.reverted
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        nonce,
+        deadline
+      )
+      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
+        .to.not.be.reverted
     })
 
     it('should reject invalid signatures', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
       const invalidSignature = ethers.hexlify(ethers.randomBytes(65))
-      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, invalidSignature))
-        .to.be.reverted
+      await expect(
+        securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, invalidSignature)
+      ).to.be.reverted
     })
 
     it('should reject signatures from non-authorized signers', async function () {
@@ -209,15 +287,23 @@ describe(`${contractName}`, () => {
         deadline,
         nonce
       })
-      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature)).to.be
-        .reverted
+      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
+        .to.be.reverted
     })
 
     it('should accept valid signatures with correct nonce', async function () {
       const nonce = await securityStaking.getNonce(dataHash, true)
-      const signature = await signStakeMessage(signer, securityStakingDomain, STAKE_AMOUNT, dataHash, true, nonce, deadline)
-      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature)).to.not
-        .be.reverted
+      const signature = await signStakeMessage(
+        signer,
+        securityStakingDomain,
+        STAKE_AMOUNT,
+        dataHash,
+        true,
+        nonce,
+        deadline
+      )
+      await expect(securityStaking.connect(staker).stakeOnMalicious(STAKE_AMOUNT, dataHash, nonce, deadline, signature))
+        .to.not.be.reverted
     })
   })
 
