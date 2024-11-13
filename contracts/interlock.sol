@@ -11,6 +11,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20Pausable
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./interfaces/IAntiBot.sol";
 
 contract InterlockNetwork is
     Initializable,
@@ -29,6 +30,8 @@ contract InterlockNetwork is
     uint256 public transferCooldownDuration;
     uint256 public transferCooldownThreshold;
     mapping(address => uint256) private _transferCooldowns;
+
+    address public antiBotProtector;
 
     /**
      * @dev Emitted when a transfer is attempted while the sender is on cooldown.
@@ -80,6 +83,12 @@ contract InterlockNetwork is
         transferCooldownThreshold = threshold;
     }
 
+    function setAntiBotProtector(
+        address _antiBotProtector
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        antiBotProtector = _antiBotProtector;
+    }
+
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
         _mint(to, amount);
     }
@@ -110,6 +119,16 @@ contract InterlockNetwork is
         ) {
             _evaluateCooldown(from, value);
         }
+
+        if (antiBotProtector != address(0)) {
+            IAntiBot(antiBotProtector).onPreTransferCheck(
+                _msgSender(),
+                from,
+                to,
+                value
+            );
+        }
+
         super._update(from, to, value);
     }
 
@@ -121,5 +140,5 @@ contract InterlockNetwork is
         }
     }
 
-    uint256[100] public __gap;
+    uint256[99] public __gap;
 }

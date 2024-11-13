@@ -531,6 +531,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "antiBotProtector",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -879,6 +892,19 @@
       }
     ],
     "name": "revokeRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_antiBotProtector",
+        "type": "address"
+      }
+    ],
+    "name": "setAntiBotProtector",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
