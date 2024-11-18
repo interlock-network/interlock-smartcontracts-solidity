@@ -17,6 +17,7 @@ describe(`${contractName}`, () => {
   let testAccount: SignerWithAddress
   let snapshot: number
 
+  const UPGRADER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('UPGRADER_ROLE'))
   const PAUSER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('PAUSER_ROLE'))
   const MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('MINTER_ROLE'))
   const BURNER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('BURNER_ROLE'))
@@ -38,6 +39,10 @@ describe(`${contractName}`, () => {
   context('Initial settings', async function () {
     it('should have DEFAULT_ADMIN role', async function () {
       expect(await ilock.hasRole(await ilock.DEFAULT_ADMIN_ROLE(), initialOwner.address)).to.equal(true)
+    })
+
+    it('should have UPGRADER role', async function () {
+      expect(await ilock.hasRole(UPGRADER_ROLE, initialOwner.address)).to.equal(true)
     })
 
     it('should have PAUSER role', async function () {
