@@ -37,7 +37,7 @@ export async function deployProxyWithDefender(
 ) {
   const contractFactory = await ethers.getContractFactory(contractName)
   const contract = await defender.deployProxy(contractFactory, params, {
-    pollingInterval: 60000,
+    timeout: 180000,
     initializer: options.initializerName,
     initialOwner: options.initialProxyOwner,
     salt: options.salt

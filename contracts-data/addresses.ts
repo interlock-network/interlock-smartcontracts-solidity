@@ -1,10 +1,10 @@
 export const sepoliaAddresses = {
-  InterlockNetwork: '0xeF75DBdCc16416F534Cd710251a1Ed930aa849e8',
+  InterlockNetwork: '0xBdC76dC5B836a0dE6D2887f902F03B4F648edD5f',
   ILSecurityStaking: '0x0000000000000000000000000000000000000000'
 }
 
 export const baseSepoliaAddresses = {
-  InterlockNetwork: '0xeF75DBdCc16416F534Cd710251a1Ed930aa849e8',
+  InterlockNetwork: '0xBdC76dC5B836a0dE6D2887f902F03B4F648edD5f',
   ILSecurityStaking: '0x0000000000000000000000000000000000000000'
 }
 
