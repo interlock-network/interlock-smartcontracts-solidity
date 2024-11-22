@@ -3,16 +3,15 @@ import { arbitrumSepoliaAddresses, baseSepoliaAddresses, sepoliaAddresses } from
 const sepoliaArgs = {
   InterlockNetwork: {
     params: {
-      initialOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+      initialOwner: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8'
     },
-    proxyAdminOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
-    salt: 'InterlockNetworkOwnsYou'
+    salt: 'HelloWorldILOCK'
   },
   ILSecurityStaking: {
     params: {
       _ilockToken: sepoliaAddresses['InterlockNetwork'],
-      _stakingPool: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
-      _admin: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+      _stakingPool: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8',
+      _admin: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8'
     }
   }
 }
@@ -20,16 +19,15 @@ const sepoliaArgs = {
 const baseSepoliaArgs = {
   InterlockNetwork: {
     params: {
-      initialOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+      initialOwner: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8'
     },
-    proxyAdminOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
-    salt: 'InterlockNetworkOwnsYou'
+    salt: 'HelloWorldILOCK'
   },
   ILSecurityStaking: {
     params: {
       _ilockToken: baseSepoliaAddresses['InterlockNetwork'],
-      _stakingPool: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
-      _admin: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F'
+      _stakingPool: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8',
+      _admin: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8'
     }
   }
 }
