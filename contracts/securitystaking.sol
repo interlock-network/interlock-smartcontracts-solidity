@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 // Compatible with OpenZeppelin Contracts ^5.0.0
 
-pragma solidity 0.8.27;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";

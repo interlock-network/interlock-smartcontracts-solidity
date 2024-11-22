@@ -5,6 +5,7 @@ const sepoliaArgs = {
     params: {
       initialOwner: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8'
     },
+    initialProxyOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
     salt: 'HelloWorldILOCK'
   },
   ILSecurityStaking: {
@@ -21,6 +22,7 @@ const baseSepoliaArgs = {
     params: {
       initialOwner: '0x43c93bE08B1D2C3f6c29B3caE7fE67F74ccf3ad8'
     },
+    initialProxyOwner: '0x4599Bb9B14e1bea536C175206cf878fe07dE390F',
     salt: 'HelloWorldILOCK'
   },
   ILSecurityStaking: {

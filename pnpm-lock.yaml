@@ -72,8 +72,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(prettier@3.3.3)
       solhint:
-        specifier: ^4.5.4
-        version: 4.5.4(typescript@5.6.3)
+        specifier: ^5.0.3
+        version: 5.0.3(typescript@5.6.3)
       solhint-plugin-prettier:
         specifier: ^0.1.0
         version: 0.1.0(prettier-plugin-solidity@1.4.1(prettier@3.3.3))(prettier@3.3.3)
@@ -2103,8 +2103,8 @@ packages:
       prettier: ^3.0.0
       prettier-plugin-solidity: ^1.0.0
 
-  solhint@4.5.4:
-    resolution: {integrity: sha512-Cu1XiJXub2q1eCr9kkJ9VPv1sGcmj3V7Zb76B0CoezDOB9bu3DxKIFFH7ggCl9fWpEPD6xBmRLfZrYijkVmujQ==}
+  solhint@5.0.3:
+    resolution: {integrity: sha512-OLCH6qm/mZTCpplTXzXTJGId1zrtNuDYP5c2e6snIv/hdRVxPfBBz/bAlL91bY/Accavkayp2Zp2BaDSrLVXTQ==}
     hasBin: true
 
   solidity-ast@0.4.59:
@@ -4842,7 +4842,7 @@ snapshots:
       prettier-linter-helpers: 1.0.0
       prettier-plugin-solidity: 1.4.1(prettier@3.3.3)
 
-  solhint@4.5.4(typescript@5.6.3):
+  solhint@5.0.3(typescript@5.6.3):
     dependencies:
       '@solidity-parser/parser': 0.18.0
       ajv: 6.12.6

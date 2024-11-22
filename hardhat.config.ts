@@ -32,7 +32,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     sepolia: {
-      url: 'https://rpc2.sepolia.org',
+      url: 'https://rpc.sepolia.org',
       chainId: 11155111
     },
     baseSepolia: {
