@@ -30,15 +30,16 @@ export async function deployProxyWithDefender(
   contractName: string,
   params: Array<any>,
   options: {
-    proxyAdminOwner?: `0x${string}`
+    initialProxyOwner?: `0x${string}`
     initializerName?: string
     salt?: string
   }
 ) {
   const contractFactory = await ethers.getContractFactory(contractName)
   const contract = await defender.deployProxy(contractFactory, params, {
+    timeout: 180000,
     initializer: options.initializerName,
-    initialOwner: options.proxyAdminOwner,
+    initialOwner: options.initialProxyOwner,
     salt: options.salt
   })
   // need to connect to local provider to use waitForDeployment
@@ -77,7 +78,7 @@ export async function deployProxyWithDefenderInteractive(
   contractName: string,
   params: any = {},
   options: {
-    proxyAdminOwner?: `0x${string}`
+    initialProxyOwner?: `0x${string}`
     initializerName?: string
     salt?: string
   }

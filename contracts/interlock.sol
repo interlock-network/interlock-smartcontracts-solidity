@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 // Compatible with OpenZeppelin Contracts ^5.0.0
 
-pragma solidity 0.8.20;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
@@ -32,7 +32,7 @@ contract InterlockNetwork is
 
     uint256 public transferCooldownDuration;
     uint256 public transferCooldownThreshold;
-    mapping(address => uint256) private _transferCooldowns;
+    mapping(address => uint256) private _transferCooldownExpiry;
 
     address public antiBotProtector;
 
@@ -66,7 +66,7 @@ contract InterlockNetwork is
     }
 
     modifier verifyCooldown(address from) {
-        if (_transferCooldowns[from] >= block.timestamp) {
+        if (_transferCooldownExpiry[from] >= block.timestamp) {
             revert InterlockTransferCooldown(from);
         }
         _;
@@ -139,17 +139,18 @@ contract InterlockNetwork is
 
     function _evaluateCooldown(address from, uint256 value) private {
         uint256 cooldown = transferCooldownDuration;
+        if (cooldown == 0) {
+            return;
+        }
         uint256 threshold = transferCooldownThreshold;
-        if (cooldown > 0 && threshold > 0 && value >= threshold) {
-            _transferCooldowns[from] = block.timestamp + cooldown;
+        if (threshold > 0 && value >= threshold) {
+            _transferCooldownExpiry[from] = block.timestamp + cooldown;
         }
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyRole(UPGRADER_ROLE)
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyRole(UPGRADER_ROLE) {}
 
     uint256[100] public __gap;
 }
