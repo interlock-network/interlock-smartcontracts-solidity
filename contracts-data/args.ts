@@ -1,4 +1,4 @@
-import { arbitrumSepoliaAddresses, baseSepoliaAddresses, sepoliaAddresses } from './addresses'
+import { arbitrumAddresses, arbitrumSepoliaAddresses, baseSepoliaAddresses, sepoliaAddresses } from './addresses'
 
 const sepoliaArgs = {
   InterlockNetwork: {
@@ -51,8 +51,26 @@ const arbitrumSepoliaArgs = {
   }
 }
 
+const arbitrumArgs = {
+  InterlockNetwork: {
+    params: {
+      initialOwner: '0xD84B6498B0B44cF8D6c521fB7bbE9a81745e0a37'
+    },
+    initialProxyOwner: '0xfa88407e9684d8abF4ee158Ea1334E89d954604d',
+    salt: 'HelloWorldILOCK'
+  },
+  ILSecurityStaking: {
+    params: {
+      _ilockToken: arbitrumAddresses['InterlockNetwork'],
+      _stakingPool: '0x0000000000000000000000000000000000000000',
+      _admin: '0xD84B6498B0B44cF8D6c521fB7bbE9a81745e0a37'
+    }
+  }
+}
+
 export const contractsArgs: Record<string, Record<'InterlockNetwork' | 'ILSecurityStaking', any>> = {
   sepolia: sepoliaArgs,
   baseSepolia: baseSepoliaArgs,
-  arbitrumSepolia: arbitrumSepoliaArgs
+  arbitrumSepolia: arbitrumSepoliaArgs,
+  arbitrum: arbitrumArgs
 }

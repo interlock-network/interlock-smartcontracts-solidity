@@ -8,7 +8,7 @@ import 'hardhat-gas-reporter'
 import { HardhatUserConfig } from 'hardhat/config'
 
 import * as dotenv from 'dotenv'
-dotenv.config({ path: './.env.dev' })
+dotenv.config({ path: './.env.prod' })
 
 const config: HardhatUserConfig = {
   abiExporter: {
@@ -42,13 +42,18 @@ const config: HardhatUserConfig = {
     arbitrumSepolia: {
       url: 'https://sepolia-rollup.arbitrum.io/rpc',
       chainId: 421614
+    },
+    arbitrum: {
+      url: 'https://arbitrum.llamarpc.com',
+      chainId: 42161
     }
   },
   etherscan: {
     apiKey: {
       sepolia: process.env.ETHERSCAN_APIKEY as string,
       baseSepolia: process.env.BASE_APIKEY as string,
-      arbitrumSepolia: process.env.ARBITRUM_APIKEY as string
+      arbitrumSepolia: process.env.ARBITRUM_APIKEY as string,
+      arbitrumOne: process.env.ARBITRUM_APIKEY as string
     },
     customChains: [
       {
