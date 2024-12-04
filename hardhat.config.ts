@@ -8,7 +8,7 @@ import 'hardhat-gas-reporter'
 import { HardhatUserConfig } from 'hardhat/config'
 
 import * as dotenv from 'dotenv'
-dotenv.config({ path: './.env.prod' })
+dotenv.config({ path: './.env.dev' })
 
 const config: HardhatUserConfig = {
   abiExporter: {
@@ -32,7 +32,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     sepolia: {
-      url: 'https://rpc.sepolia.org',
+      url: 'https://1rpc.io/sepolia',
       chainId: 11155111
     },
     baseSepolia: {
