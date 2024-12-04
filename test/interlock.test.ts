@@ -13,17 +13,15 @@ describe(`${contractName}`, () => {
   let initialOwner: SignerWithAddress
   let pauser: SignerWithAddress
   let minter: SignerWithAddress
-  let burner: SignerWithAddress
   let testAccount: SignerWithAddress
   let snapshot: number
 
   const UPGRADER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('UPGRADER_ROLE'))
   const PAUSER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('PAUSER_ROLE'))
   const MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('MINTER_ROLE'))
-  const BURNER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('BURNER_ROLE'))
 
   before(async () => {
-    ;[deployer, initialOwner, pauser, minter, burner, testAccount] = await ethers.getSigners()
+    ;[deployer, initialOwner, pauser, minter, testAccount] = await ethers.getSigners()
     ilock = await deployProxy(contractName, deployer, [initialOwner.address])
   })
 
@@ -51,10 +49,6 @@ describe(`${contractName}`, () => {
 
     it('should have MINTER role', async function () {
       expect(await ilock.hasRole(MINTER_ROLE, initialOwner.address)).to.equal(true)
-    })
-
-    it('should have BURNER role', async function () {
-      expect(await ilock.hasRole(BURNER_ROLE, initialOwner.address)).to.equal(true)
     })
 
     it('should have the correct name', async function () {
@@ -118,28 +112,20 @@ describe(`${contractName}`, () => {
 
   context('Burning', async function () {
     beforeEach(async () => {
-      await ilock.connect(initialOwner).grantRole(BURNER_ROLE, burner.address)
       await ilock.connect(initialOwner).mint(testAccount.address, ethers.parseEther('100'))
     })
 
     it('should burn', async function () {
       const initialBalance = await ilock.balanceOf(testAccount.address)
       const amount = ethers.parseEther('1')
-      await ilock.connect(burner).burn(testAccount.address, amount)
+      await ilock.connect(testAccount).burn(amount)
       expect(await ilock.balanceOf(testAccount.address)).to.equal(initialBalance - amount)
-    })
-
-    it('should revert burn if not the burner', async function () {
-      const amount = ethers.parseEther('1')
-      await expect(ilock.connect(testAccount).burn(testAccount.address, amount))
-        .to.be.revertedWithCustomError(ilock, 'AccessControlUnauthorizedAccount')
-        .withArgs(testAccount.address, BURNER_ROLE)
     })
 
     it('should revert burn if not enough balance', async function () {
       const initialBalance = await ilock.balanceOf(testAccount.address)
       const amount = initialBalance + BigInt(1)
-      await expect(ilock.connect(burner).burn(testAccount.address, amount))
+      await expect(ilock.connect(testAccount).burn(amount))
         .to.be.revertedWithCustomError(ilock, 'ERC20InsufficientBalance')
         .withArgs(testAccount.address, initialBalance, amount)
     })

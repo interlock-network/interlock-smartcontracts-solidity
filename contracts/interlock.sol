@@ -26,7 +26,6 @@ contract InterlockNetwork is
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant COOLDOWN_WHITELISTED =
         keccak256("COOLDOWN_WHITELISTED");
 
@@ -58,7 +57,6 @@ contract InterlockNetwork is
         _grantRole(UPGRADER_ROLE, owner);
         _grantRole(PAUSER_ROLE, owner);
         _grantRole(MINTER_ROLE, owner);
-        _grantRole(BURNER_ROLE, owner);
         _grantRole(COOLDOWN_WHITELISTED, owner);
 
         transferCooldownDuration = 1 days;
@@ -72,18 +70,18 @@ contract InterlockNetwork is
         _;
     }
 
-    function pause() public onlyRole(PAUSER_ROLE) {
+    function pause() external onlyRole(PAUSER_ROLE) {
         _pause();
     }
 
-    function unpause() public onlyRole(PAUSER_ROLE) {
+    function unpause() external onlyRole(PAUSER_ROLE) {
         _unpause();
     }
 
     function setUpCooldown(
         uint256 duration,
         uint256 threshold
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         transferCooldownDuration = duration;
         transferCooldownThreshold = threshold;
     }
@@ -94,12 +92,14 @@ contract InterlockNetwork is
         antiBotProtector = _antiBotProtector;
     }
 
-    function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
         _mint(to, amount);
     }
 
-    function burn(address from, uint256 amount) public onlyRole(BURNER_ROLE) {
-        _burn(from, amount);
+    function burn(uint256 value) public returns (bool) {
+        address owner = _msgSender();
+        _burn(owner, value);
+        return true;
     }
 
     // The following functions are overrides required by Solidity.
@@ -137,6 +137,10 @@ contract InterlockNetwork is
         super._update(from, to, value);
     }
 
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyRole(UPGRADER_ROLE) {}
+
     function _evaluateCooldown(address from, uint256 value) private {
         uint256 cooldown = transferCooldownDuration;
         if (cooldown == 0) {
@@ -147,10 +151,6 @@ contract InterlockNetwork is
             _transferCooldownExpiry[from] = block.timestamp + cooldown;
         }
     }
-
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal override onlyRole(UPGRADER_ROLE) {}
 
     uint256[100] public __gap;
 }
