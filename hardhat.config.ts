@@ -53,7 +53,7 @@ const config: HardhatUserConfig = {
       sepolia: process.env.ETHERSCAN_APIKEY as string,
       baseSepolia: process.env.BASE_APIKEY as string,
       arbitrumSepolia: process.env.ARBITRUM_APIKEY as string,
-      arbitrum: process.env.ARBITRUM_APIKEY as string
+      arbitrumOne: process.env.ARBITRUM_APIKEY as string
     },
     customChains: [
       {
