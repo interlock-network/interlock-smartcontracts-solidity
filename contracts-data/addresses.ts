@@ -15,7 +15,7 @@ export const arbitrumSepoliaAddresses = {
 
 export const arbitrumAddresses = {
   InterlockNetwork: '0xcf1D7D1a7bBF5D11CCFe717FC6A9A45C8dD9c7bE',
-  ILSecurityStaking: '0x0000000000000000000000000000000000000000'
+  ILSecurityStaking: '0x8825c4C8Ee081464CC5aB5c3A351c6Cf49985c30'
 }
 
 export const contractsAddresses: Record<string, Record<'InterlockNetwork' | 'ILSecurityStaking', string>> = {
