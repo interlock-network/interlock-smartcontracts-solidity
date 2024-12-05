@@ -8,7 +8,7 @@ import 'hardhat-gas-reporter'
 import { HardhatUserConfig } from 'hardhat/config'
 
 import * as dotenv from 'dotenv'
-dotenv.config({ path: './.env.dev' })
+dotenv.config({ path: './.env.prod' })
 
 const config: HardhatUserConfig = {
   abiExporter: {

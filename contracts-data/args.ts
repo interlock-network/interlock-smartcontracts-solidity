@@ -62,7 +62,7 @@ const arbitrumArgs = {
   ILSecurityStaking: {
     params: {
       _ilockToken: arbitrumAddresses['InterlockNetwork'],
-      _stakingPool: '0x0000000000000000000000000000000000000000',
+      _stakingPool: '0x1d60EBFa62071C541a7E3C95Aa78045941Db12c4',
       _admin: '0xD84B6498B0B44cF8D6c521fB7bbE9a81745e0a37'
     }
   }
